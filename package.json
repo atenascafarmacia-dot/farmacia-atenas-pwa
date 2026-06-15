@@ -4,13 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:https": "next dev --experimental-https",
     "build": "next build",
     "start": "next start",
+    "preview": "next build && next start",
+    "preview:network": "next build && next start -H 0.0.0.0",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4"
