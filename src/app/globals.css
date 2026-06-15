@@ -1,28 +1,53 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Design tokens (Tailwind v4 `@theme`). These become utilities
+ * (e.g. `bg-primary-700`, `text-ink`, `border-border`, `font-display`,
+ * `shadow-soft`) and CSS variables on :root.
+ */
+@theme {
+  /* Brand — primary */
+  --color-primary-700: #0a5c46;
+  --color-primary-600: #0e7355;
+  --color-primary-500: #15916b;
+  --color-primary-100: #dcede6;
+  --color-primary-50: #eef5f2;
+
+  /* Brand — accent */
+  --color-accent-600: #b0852f;
+  --color-accent-100: #f3e9ce;
+
+  /* Neutrals & surfaces */
+  --color-surface: #f7f6f2;
+  --color-card: #ffffff;
+  --color-border: #e6e2d9;
+  --color-ink: #16201c;
+  --color-muted: #5e6b64;
+
+  /* Semantic — text/icon color + matching background */
+  --color-success: #15803d;
+  --color-success-bg: #dcf0e4;
+  --color-warning: #9a6b16;
+  --color-warning-bg: #f3e9ce;
+  --color-danger: #b42318;
+  --color-danger-bg: #fbe3e1;
+
+  /* Typography (wired to next/font variables, with fallbacks) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+
+  /* Radius — cards use 2xl */
+  --radius-2xl: 1rem;
+
+  /* Soft, reusable elevation */
+  --shadow-soft: 0 1px 2px rgb(22 32 28 / 0.04), 0 6px 20px rgb(22 32 28 / 0.06);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Global defaults: surface background, ink text, sans family. */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }
 
 /* Eliminate 300ms tap delay on mobile */

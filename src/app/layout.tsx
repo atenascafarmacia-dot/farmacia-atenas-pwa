@@ -1,18 +1,20 @@
 import "./globals.css";
 
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 
 import { MobileShell } from "@/components/templates/MobileShell";
 import { getCurrentUser, isOperator } from "@/services/session.service";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Sans body font → exposed as `--font-inter` (Tailwind `font-sans`).
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Display font → exposed as `--font-fraunces` (Tailwind `font-display`).
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
@@ -46,7 +48,7 @@ export default async function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${inter.variable} ${fraunces.variable} antialiased`}
     >
       <body>
         <MobileShell isOperator={operator} userName={user?.name ?? null}>
