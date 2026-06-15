@@ -62,4 +62,10 @@ export const strings = {
       cancelled: "Cancelado",
     },
   },
+
+  nav: {
+    catalog: "Catálogo",
+    cart: "Carrito",
+    operator: "Operador",
+  },
 } as const;
