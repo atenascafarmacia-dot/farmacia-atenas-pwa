@@ -40,6 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# SQLite database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
 # PWA generated files
 /public/sw.js
 /public/sw.js.map
@@ -47,3 +53,4 @@ next-env.d.ts
 /public/workbox-*.js.map
 
 .idea
+/src/generated/prisma
