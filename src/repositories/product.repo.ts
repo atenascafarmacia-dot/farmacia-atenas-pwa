@@ -52,6 +52,19 @@ export const productRepository = {
   findById: (id: string): Promise<ProductDto | null> =>
     prisma.product.findUnique({ where: { id }, select: SELECT_PRODUCT }),
 
+  /** Fetches products by IDs, preserving the given order (e.g. a ranking). */
+  findByIds: async (ids: string[]): Promise<ProductDto[]> => {
+    if (ids.length === 0) return [];
+    const products = await prisma.product.findMany({
+      where: { id: { in: ids } },
+      select: SELECT_PRODUCT,
+    });
+    const byId = new Map(products.map((p) => [p.id, p]));
+    return ids
+      .map((id) => byId.get(id))
+      .filter((p): p is ProductDto => p !== undefined);
+  },
+
   findCategories: (): Promise<string[]> =>
     prisma.product
       .findMany({ select: { category: true }, distinct: ["category"], orderBy: { category: "asc" } })

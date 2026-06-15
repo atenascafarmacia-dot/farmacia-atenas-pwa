@@ -50,6 +50,7 @@ export const strings = {
     addToCart: "Agregar",
     prescription: "Requiere receta médica",
     price: "Precio",
+    frequentlyBought: "Comprados frecuentemente",
   },
 
   orders: {
