@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
+import { createOrderAction } from "@/app/_actions/order.action";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Price } from "@/components/atoms/Price";
@@ -10,10 +13,29 @@ import { strings } from "@/lib/strings";
 import { selectCartTotal, useCartStore } from "@/store/cart";
 
 export function CartList() {
+  const router = useRouter();
   const items = useCartStore((s) => s.items);
   const remove = useCartStore((s) => s.remove);
   const setQuantity = useCartStore((s) => s.setQuantity);
+  const clear = useCartStore((s) => s.clear);
   const total = useCartStore(selectCartTotal);
+
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleCheckout() {
+    setError(null);
+    const payload = items.map((i) => ({ productId: i.productId, quantity: i.quantity }));
+    startTransition(async () => {
+      const result = await createOrderAction(payload);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      clear();
+      router.push(`/pedido/${result.code}`);
+    });
+  }
 
   if (items.length === 0) {
     return (
@@ -84,7 +106,17 @@ export function CartList() {
           <span className="text-base font-semibold text-zinc-900">{strings.cart.total}</span>
           <Price amount={total} className="text-xl text-green-700" />
         </div>
-        <Button className="w-full" size="lg">
+        {error && (
+          <p role="alert" className="mb-3 text-sm text-red-600">
+            {error}
+          </p>
+        )}
+        <Button
+          className="w-full"
+          size="lg"
+          loading={isPending}
+          onClick={handleCheckout}
+        >
           {strings.cart.checkout}
         </Button>
       </div>

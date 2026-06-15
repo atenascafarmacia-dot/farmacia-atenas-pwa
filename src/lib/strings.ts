@@ -54,6 +54,23 @@ export const strings = {
   orders: {
     title: "Mis pedidos",
     empty: "No tienes pedidos aún.",
+    create: {
+      invalid: "Los datos del pedido no son válidos.",
+      notIdentified: "Debes identificarte antes de realizar un pedido.",
+      productUnavailable: "Uno de los productos ya no está disponible.",
+      insufficientStock: "No hay stock suficiente para uno de los productos.",
+      failed: "No se pudo crear el pedido. Intenta de nuevo.",
+    },
+    receipt: {
+      showAtCounter: "Muestra esto en el mostrador",
+      orderCode: "Código del pedido",
+      qrAlt: "Código QR del pedido",
+      summary: "Resumen del pedido",
+      total: "Total",
+      backToCatalog: "Volver al catálogo",
+      notFoundTitle: "Pedido no encontrado",
+      notFoundMessage: "El pedido que buscas no existe o el código no es válido.",
+    },
     status: {
       pending: "Pendiente",
       processing: "En proceso",
