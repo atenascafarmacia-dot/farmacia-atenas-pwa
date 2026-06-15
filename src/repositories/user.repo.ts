@@ -11,15 +11,15 @@ const SELECT_USER = {
 export type UserDto = {
   id: string;
   name: string;
-  email: string;
-  phone: string | null;
+  email: string | null;
+  phone: string;
   createdAt: Date;
 };
 
 export type CreateUserData = {
   name: string;
-  email: string;
-  phone?: string;
+  phone: string;
+  email?: string;
 };
 
 export const userRepository = {
@@ -28,6 +28,9 @@ export const userRepository = {
 
   findByEmail: (email: string): Promise<UserDto | null> =>
     prisma.user.findUnique({ where: { email }, select: SELECT_USER }),
+
+  findByPhone: (phone: string): Promise<UserDto | null> =>
+    prisma.user.findFirst({ where: { phone }, select: SELECT_USER }),
 
   create: (data: CreateUserData): Promise<UserDto> =>
     prisma.user.create({ data, select: SELECT_USER }),

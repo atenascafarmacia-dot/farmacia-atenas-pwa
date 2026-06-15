@@ -9,7 +9,7 @@ import { Icon } from "@/components/atoms/Icon";
 import { strings } from "@/lib/strings";
 
 const NAV_ITEMS: Array<{ href: string; label: string; icon: IconName }> = [
-  { href: "/", label: strings.nav.catalog, icon: "catalog" },
+  { href: "/catalogo", label: strings.nav.catalog, icon: "catalog" },
   { href: "/carrito", label: strings.nav.cart, icon: "cart" },
   { href: "/operador", label: strings.nav.operator, icon: "operator" },
 ];
@@ -24,8 +24,7 @@ function BottomNav() {
     >
       <ul className="flex" role="list">
         {NAV_ITEMS.map(({ href, label, icon }) => {
-          const isActive =
-            href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const isActive = pathname === href || pathname.startsWith(href + "/");
           return (
             <li key={href} className="flex-1">
               <Link

@@ -10,8 +10,8 @@ export const userIdentificationSchema = z.object({
     .string()
     .trim()
     .regex(
-      /^\+?[\d\s\-().]{7,20}$/,
-      "Número de teléfono inválido. Ejemplo: +58 1234567891",
+      /^(\+58|0)\d{10}$/,
+      "Número inválido. Usa +58XXXXXXXXXX o 0XXXXXXXXXX (11 dígitos).",
     ),
 });
 

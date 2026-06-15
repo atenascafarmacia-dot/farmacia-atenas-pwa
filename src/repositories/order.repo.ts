@@ -26,7 +26,7 @@ export type OrderDetailDto = {
   total: number;
   createdAt: Date;
   updatedAt: Date;
-  user: { id: string; name: string; email: string };
+  user: { id: string; name: string; email: string | null };
   items: OrderItemDto[];
 };
 
