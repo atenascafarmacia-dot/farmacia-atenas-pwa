@@ -108,6 +108,8 @@ export const strings = {
     emptyMessage: "Escanea el QR del cliente o teclea el código para ver el pedido.",
     notFoundTitle: "Pedido no encontrado",
     notFound: "No existe ningún pedido con ese código.",
+    rateLimitedTitle: "Demasiadas búsquedas",
+    rateLimitedMessage: "Espera unos segundos antes de volver a buscar.",
     customer: "Cliente",
     phone: "Teléfono",
     email: "Correo",

@@ -14,6 +14,28 @@ const baseConfig: NextConfig = {
   // The `*` wildcard matches a single segment, so this covers the whole
   // 192.168.1.x subnet (handles the phone's IP changing via DHCP).
   allowedDevOrigins: ["192.168.1.*"],
+
+  // Baseline security headers applied to every route.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          // Disallow being framed → clickjacking protection.
+          { key: "X-Frame-Options", value: "DENY" },
+          // Stop MIME-type sniffing.
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          // Don't leak full URLs to third-party origins.
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // The app uses no camera/mic/geolocation; deny them outright.
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withPWAInit({ dest: "public", register: true, reloadOnOnline: true })(baseConfig);
