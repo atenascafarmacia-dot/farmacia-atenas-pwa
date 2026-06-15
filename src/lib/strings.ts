@@ -1,4 +1,10 @@
 export const strings = {
+  brand: {
+    name: "Farmacia Atenas",
+    word1: "Farmacia",
+    word2: "Atenas",
+  },
+
   common: {
     loading: "Cargando...",
     error: "Algo salió mal. Por favor intenta de nuevo.",

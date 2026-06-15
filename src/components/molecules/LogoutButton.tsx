@@ -23,7 +23,7 @@ export function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={isPending}
-      className="min-h-[44px] rounded-lg px-3 text-sm font-medium text-zinc-600 transition-colors hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-50"
+      className="min-h-[44px] rounded-full px-2.5 text-sm font-medium text-muted transition-colors hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger disabled:opacity-50"
     >
       {strings.auth.signOut}
     </button>

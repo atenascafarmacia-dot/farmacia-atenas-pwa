@@ -7,7 +7,8 @@ import type { ReactNode } from "react";
 import type { IconName } from "@/components/atoms/Icon";
 import { Icon } from "@/components/atoms/Icon";
 import { StoreHydrator } from "@/components/atoms/StoreHydrator";
-import { LogoutButton } from "@/components/molecules/LogoutButton";
+import { Wordmark } from "@/components/atoms/Wordmark";
+import { UserChip } from "@/components/molecules/UserChip";
 import { strings } from "@/lib/strings";
 import { selectCartCount, useCartStore } from "@/store/cart";
 
@@ -71,12 +72,9 @@ function BottomNav({ isOperator }: { isOperator: boolean }) {
 
 function TopBar({ userName }: { userName: string }) {
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-2">
-      <span className="truncate text-sm text-zinc-600">
-        {strings.auth.greeting}{" "}
-        <span className="font-semibold text-zinc-900">{userName}</span>
-      </span>
-      <LogoutButton />
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-2 border-b border-border bg-card/95 px-4 py-2 shadow-soft backdrop-blur">
+      <Wordmark />
+      <UserChip userName={userName} />
     </header>
   );
 }

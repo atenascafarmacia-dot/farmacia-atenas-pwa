@@ -19,18 +19,18 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Farmacia",
+  title: "Farmacia Atenas",
   description: "Tu farmacia de confianza",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Farmacia",
+    title: "Farmacia Atenas",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#16a34a",
+  themeColor: "#0A5C46",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

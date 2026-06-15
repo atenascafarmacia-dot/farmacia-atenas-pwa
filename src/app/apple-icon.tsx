@@ -3,46 +3,35 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
+// Same olive-branch mark as the PWA icons, on the apple touch icon.
+const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#0A5C46"/>
+  <path d="M58 142C86 120 104 96 134 58" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <g fill="#FFFFFF">
+    <ellipse cx="74" cy="122" rx="19" ry="8.5" transform="rotate(-33 74 122)"/>
+    <ellipse cx="98" cy="98" rx="19" ry="8.5" transform="rotate(-33 98 98)"/>
+    <ellipse cx="120" cy="74" rx="19" ry="8.5" transform="rotate(-33 120 74)"/>
+    <ellipse cx="92" cy="132" rx="15" ry="7" transform="rotate(24 92 132)"/>
+  </g>
+  <g fill="#F3E9CE">
+    <circle cx="60" cy="140" r="8"/>
+    <circle cx="136" cy="56" r="9"/>
+  </g>
+</svg>`;
+
 export default function AppleIcon() {
+  const src = `data:image/svg+xml,${encodeURIComponent(ICON_SVG)}`;
   return new ImageResponse(
     (
       <div
         style={{
+          display: "flex",
           width: 180,
           height: 180,
-          background: "#16a34a",
-          borderRadius: 40,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          backgroundImage: `url("${src}")`,
+          backgroundSize: "180px 180px",
         }}
-      >
-        {/* Cruz horizontal */}
-        <div style={{ position: "relative", width: 100, height: 100, display: "flex" }}>
-          <div
-            style={{
-              position: "absolute",
-              left: 37,
-              top: 0,
-              width: 26,
-              height: 100,
-              background: "white",
-              borderRadius: 6,
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 37,
-              width: 100,
-              height: 26,
-              background: "white",
-              borderRadius: 6,
-            }}
-          />
-        </div>
-      </div>
+      />
     ),
     { ...size },
   );
