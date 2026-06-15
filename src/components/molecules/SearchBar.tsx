@@ -8,16 +8,18 @@ import { strings } from "@/lib/strings";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  defaultValue?: string;
   placeholder?: string;
   className?: string;
 }
 
 export function SearchBar({
   onSearch,
+  defaultValue = "",
   placeholder = "Buscar productos...",
   className = "",
 }: SearchBarProps) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultValue);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

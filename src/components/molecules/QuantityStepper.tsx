@@ -31,7 +31,7 @@ export function QuantityStepper({
         <Icon name="minus" size={16} />
       </Button>
       <span
-        className="w-10 text-center text-base font-semibold tabular-nums"
+        className="w-10 text-center text-base font-bold text-zinc-900 tabular-nums"
         aria-live="polite"
         aria-atomic="true"
       >

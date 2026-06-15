@@ -1,18 +1,14 @@
-"use client";
-
 import { Badge } from "@/components/atoms/Badge";
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
 import { Price } from "@/components/atoms/Price";
+import { AddToCartButton } from "@/components/molecules/AddToCartButton";
 import { strings } from "@/lib/strings";
 import type { ProductDto } from "@/repositories/product.repo";
 
 interface ProductCardProps {
   product: ProductDto;
-  onAddToCart?: (productId: string) => void;
 }
 
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const outOfStock = product.stock === 0;
 
   return (
@@ -42,22 +38,13 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
       <div className="mt-auto flex items-center justify-between">
         <Price amount={product.price} className="text-lg text-green-700" />
-        <Button
-          size="sm"
-          variant={outOfStock ? "secondary" : "primary"}
-          disabled={outOfStock}
-          onClick={() => onAddToCart?.(product.id)}
-          aria-label={`${strings.products.addToCart}: ${product.name}`}
-        >
-          {outOfStock ? (
-            strings.products.outOfStock
-          ) : (
-            <>
-              <Icon name="plus" size={14} />
-              {strings.products.addToCart}
-            </>
-          )}
-        </Button>
+        <AddToCartButton
+          productId={product.id}
+          name={product.name}
+          price={product.price}
+          imageUrl={product.imageUrl}
+          outOfStock={outOfStock}
+        />
       </div>
     </article>
   );

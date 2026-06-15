@@ -6,13 +6,30 @@ import type { ReactNode } from "react";
 
 import type { IconName } from "@/components/atoms/Icon";
 import { Icon } from "@/components/atoms/Icon";
+import { StoreHydrator } from "@/components/atoms/StoreHydrator";
 import { strings } from "@/lib/strings";
+import { selectCartCount, useCartStore } from "@/store/cart";
 
 const NAV_ITEMS: Array<{ href: string; label: string; icon: IconName }> = [
   { href: "/catalogo", label: strings.nav.catalog, icon: "catalog" },
   { href: "/carrito", label: strings.nav.cart, icon: "cart" },
   { href: "/operador", label: strings.nav.operator, icon: "operator" },
 ];
+
+function CartBadge() {
+  const count = useCartStore(selectCartCount);
+
+  if (count === 0) return null;
+
+  return (
+    <span
+      aria-label={`${count} productos en el carrito`}
+      className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-green-600 text-[10px] font-bold text-white"
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
 
 function BottomNav() {
   const pathname = usePathname();
@@ -34,7 +51,10 @@ function BottomNav() {
                   isActive ? "text-green-600" : "text-zinc-500 hover:text-zinc-800"
                 }`}
               >
-                <Icon name={icon} size={22} />
+                <span className="relative">
+                  <Icon name={icon} size={22} />
+                  {icon === "cart" && <CartBadge />}
+                </span>
                 <span>{label}</span>
               </Link>
             </li>
@@ -56,6 +76,7 @@ export function MobileShell({ children }: MobileShellProps) {
         <main className="flex-1 pb-[56px]">{children}</main>
       </div>
       <BottomNav />
+      <StoreHydrator />
     </div>
   );
 }
