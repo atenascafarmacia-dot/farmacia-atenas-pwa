@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { MobileShell } from "@/components/templates/MobileShell";
+import { getCurrentUser, isOperator } from "@/services/session.service";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,18 +34,24 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The operator nav entry is only shown to the configured operator.
+  const user = await getCurrentUser();
+  const operator = isOperator(user);
+
   return (
     <html
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body>
-        <MobileShell>{children}</MobileShell>
+        <MobileShell isOperator={operator} userName={user?.name ?? null}>
+          {children}
+        </MobileShell>
       </body>
     </html>
   );

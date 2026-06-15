@@ -7,13 +7,16 @@ import type { ReactNode } from "react";
 import type { IconName } from "@/components/atoms/Icon";
 import { Icon } from "@/components/atoms/Icon";
 import { StoreHydrator } from "@/components/atoms/StoreHydrator";
+import { LogoutButton } from "@/components/molecules/LogoutButton";
 import { strings } from "@/lib/strings";
 import { selectCartCount, useCartStore } from "@/store/cart";
 
-const NAV_ITEMS: Array<{ href: string; label: string; icon: IconName }> = [
+type NavItem = { href: string; label: string; icon: IconName; operatorOnly?: boolean };
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/catalogo", label: strings.nav.catalog, icon: "catalog" },
   { href: "/carrito", label: strings.nav.cart, icon: "cart" },
-  { href: "/operador", label: strings.nav.operator, icon: "operator" },
+  { href: "/operador", label: strings.nav.operator, icon: "operator", operatorOnly: true },
 ];
 
 function CartBadge() {
@@ -31,8 +34,9 @@ function CartBadge() {
   );
 }
 
-function BottomNav() {
+function BottomNav({ isOperator }: { isOperator: boolean }) {
   const pathname = usePathname();
+  const items = NAV_ITEMS.filter((item) => !item.operatorOnly || isOperator);
 
   return (
     <nav
@@ -40,7 +44,7 @@ function BottomNav() {
       className="fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 border-t border-zinc-200 bg-white"
     >
       <ul className="flex" role="list">
-        {NAV_ITEMS.map(({ href, label, icon }) => {
+        {items.map(({ href, label, icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
           return (
             <li key={href} className="flex-1">
@@ -65,17 +69,36 @@ function BottomNav() {
   );
 }
 
-interface MobileShellProps {
-  children: ReactNode;
+function TopBar({ userName }: { userName: string }) {
+  return (
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-2">
+      <span className="truncate text-sm text-zinc-600">
+        {strings.auth.greeting}{" "}
+        <span className="font-semibold text-zinc-900">{userName}</span>
+      </span>
+      <LogoutButton />
+    </header>
+  );
 }
 
-export function MobileShell({ children }: MobileShellProps) {
+interface MobileShellProps {
+  children: ReactNode;
+  isOperator?: boolean;
+  userName?: string | null;
+}
+
+export function MobileShell({
+  children,
+  isOperator = false,
+  userName = null,
+}: MobileShellProps) {
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50">
       <div className="mx-auto flex w-full max-w-[430px] flex-1 flex-col">
+        {userName && <TopBar userName={userName} />}
         <main className="flex-1 pb-[56px]">{children}</main>
       </div>
-      <BottomNav />
+      <BottomNav isOperator={isOperator} />
       <StoreHydrator />
     </div>
   );

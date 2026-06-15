@@ -16,6 +16,11 @@ export async function getOrderByCode(code: string): Promise<OrderDetailDto | nul
   return orderRepository.findByCode(code);
 }
 
+/** Marks an order as completed (picked up at the counter). */
+export async function completeOrder(orderId: string): Promise<void> {
+  await orderRepository.updateStatus(orderId, "COMPLETADA");
+}
+
 /** Maps a domain error to a user-facing Spanish message. */
 function messageFor(error: unknown): string {
   if (error instanceof OrderError) {

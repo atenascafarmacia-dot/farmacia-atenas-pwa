@@ -26,7 +26,7 @@ export type OrderDetailDto = {
   total: number;
   createdAt: Date;
   updatedAt: Date;
-  user: { id: string; name: string; email: string | null };
+  user: { id: string; name: string; email: string | null; phone: string };
   items: OrderItemDto[];
 };
 
@@ -56,7 +56,7 @@ const SELECT_ORDER_DETAIL = {
   total: true,
   createdAt: true,
   updatedAt: true,
-  user: { select: { id: true, name: true, email: true } },
+  user: { select: { id: true, name: true, email: true, phone: true } },
   items: {
     select: {
       id: true,

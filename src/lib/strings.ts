@@ -23,6 +23,7 @@ export const strings = {
   },
 
   auth: {
+    greeting: "Hola,",
     signIn: "Iniciar sesión",
     signOut: "Cerrar sesión",
     signUp: "Registrarse",
@@ -78,6 +79,31 @@ export const strings = {
       delivered: "Entregado",
       cancelled: "Cancelado",
     },
+    // Maps OrderStatus enum values to their Spanish label.
+    statusLabel: {
+      PENDIENTE: "Pendiente",
+      PROCESANDO: "En proceso",
+      COMPLETADA: "Completada",
+      CANCELADA: "Cancelada",
+    },
+  },
+
+  operator: {
+    title: "Operador",
+    subtitle: "Recupera un pedido por su código.",
+    codeLabel: "Código del pedido",
+    codePlaceholder: "FARM-XXXXX",
+    searchButton: "Buscar",
+    notFound: "No existe ningún pedido con ese código.",
+    customer: "Cliente",
+    phone: "Teléfono",
+    email: "Correo",
+    items: "Productos",
+    total: "Total",
+    status: "Estado",
+    complete: "Marcar como completada",
+    completeError: "No se pudo actualizar el pedido. Intenta de nuevo.",
+    alreadyCompleted: "Este pedido ya fue completado.",
   },
 
   nav: {

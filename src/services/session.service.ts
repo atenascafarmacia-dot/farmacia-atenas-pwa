@@ -28,6 +28,17 @@ export async function clearSession(): Promise<void> {
   cookieStore.delete(COOKIE_NAME);
 }
 
+/**
+ * Whether the given user is the configured operator. The operator is matched
+ * by phone against the build-time `OPERATOR_PHONE` env var. Returns false when
+ * the var is unset, so the operator view stays closed by default.
+ */
+export function isOperator(user: UserDto | null): boolean {
+  const operatorPhone = process.env.OPERATOR_PHONE?.trim();
+  if (!operatorPhone || !user) return false;
+  return user.phone.trim() === operatorPhone;
+}
+
 export async function findOrCreateUser(
   name: string,
   phone: string,
