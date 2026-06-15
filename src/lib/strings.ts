@@ -2,8 +2,14 @@ export const strings = {
   common: {
     loading: "Cargando...",
     error: "Algo salió mal. Por favor intenta de nuevo.",
+    errorTitle: "Algo salió mal",
     empty: "No hay resultados.",
     retry: "Reintentar",
+    goCatalog: "Ir al catálogo",
+    notFound: {
+      title: "Página no encontrada",
+      message: "La página que buscas no existe o fue movida.",
+    },
     cancel: "Cancelar",
     confirm: "Confirmar",
     save: "Guardar",
@@ -36,6 +42,8 @@ export const strings = {
   cart: {
     title: "Carrito",
     empty: "Tu carrito está vacío.",
+    emptyHint: "Agrega productos desde el catálogo.",
+    goCatalog: "Ver catálogo",
     addItem: "Agregar al carrito",
     removeItem: "Eliminar del carrito",
     checkout: "Proceder al pago",
@@ -51,6 +59,7 @@ export const strings = {
     prescription: "Requiere receta médica",
     price: "Precio",
     frequentlyBought: "Comprados frecuentemente",
+    emptyHint: "Intenta con otro término o categoría.",
   },
 
   orders: {
@@ -95,6 +104,9 @@ export const strings = {
     codeLabel: "Código del pedido",
     codePlaceholder: "FARM-XXXXX",
     searchButton: "Buscar",
+    emptyTitle: "Busca un pedido",
+    emptyMessage: "Escanea el QR del cliente o teclea el código para ver el pedido.",
+    notFoundTitle: "Pedido no encontrado",
     notFound: "No existe ningún pedido con ese código.",
     customer: "Cliente",
     phone: "Teléfono",

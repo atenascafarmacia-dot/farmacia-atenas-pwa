@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { EmptyState } from "@/components/molecules/EmptyState";
 import { OperatorOrderPanel } from "@/components/organisms/OperatorOrderPanel";
 import { OperatorSearch } from "@/components/organisms/OperatorSearch";
 import { strings } from "@/lib/strings";
@@ -36,13 +37,22 @@ export default async function OperadorPage({
 
       <OperatorSearch initialCode={rawCode} />
 
+      {!rawCode && (
+        <EmptyState
+          icon="🔎"
+          title={strings.operator.emptyTitle}
+          message={strings.operator.emptyMessage}
+        />
+      )}
+
       {rawCode && !order && (
-        <p
-          role="alert"
-          className="rounded-xl bg-red-50 px-4 py-3 text-center text-sm font-medium text-red-700"
-        >
-          {strings.operator.notFound}
-        </p>
+        <div role="alert">
+          <EmptyState
+            icon="❌"
+            title={strings.operator.notFoundTitle}
+            message={strings.operator.notFound}
+          />
+        </div>
       )}
 
       {order && <OperatorOrderPanel order={order} />}

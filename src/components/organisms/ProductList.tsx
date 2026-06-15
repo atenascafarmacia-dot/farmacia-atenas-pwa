@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/molecules/EmptyState";
 import { ProductCard } from "@/components/molecules/ProductCard";
 import { strings } from "@/lib/strings";
 import type { ProductDto } from "@/repositories/product.repo";
@@ -10,14 +11,13 @@ interface ProductListProps {
 
 export function ProductList({ products, filters }: ProductListProps) {
   if (products.length === 0) {
+    const isFiltered = Boolean(filters?.search ?? filters?.category);
     return (
-      <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-        <span aria-hidden="true" className="text-5xl">🔍</span>
-        <p className="text-base font-medium text-zinc-700">{strings.products.empty}</p>
-        {(filters?.search ?? filters?.category) && (
-          <p className="text-sm text-zinc-400">Intenta con otro término o categoría.</p>
-        )}
-      </div>
+      <EmptyState
+        icon="🔍"
+        title={strings.products.empty}
+        message={isFiltered ? strings.products.emptyHint : undefined}
+      />
     );
   }
 

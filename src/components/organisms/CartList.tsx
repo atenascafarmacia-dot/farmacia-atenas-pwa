@@ -8,6 +8,7 @@ import { createOrderAction } from "@/app/_actions/order.action";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Price } from "@/components/atoms/Price";
+import { EmptyState } from "@/components/molecules/EmptyState";
 import { QuantityStepper } from "@/components/molecules/QuantityStepper";
 import { strings } from "@/lib/strings";
 import { selectCartTotal, useCartStore } from "@/store/cart";
@@ -39,16 +40,16 @@ export function CartList() {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-        <span aria-hidden="true" className="text-6xl">🛒</span>
-        <div>
-          <p className="text-lg font-semibold text-zinc-800">{strings.cart.empty}</p>
-          <p className="mt-1 text-sm text-zinc-500">Agrega productos desde el catálogo.</p>
-        </div>
-        <Link href="/catalogo">
-          <Button variant="outline">Ver catálogo</Button>
-        </Link>
-      </div>
+      <EmptyState
+        icon="🛒"
+        title={strings.cart.empty}
+        message={strings.cart.emptyHint}
+        action={
+          <Link href="/catalogo">
+            <Button variant="outline">{strings.cart.goCatalog}</Button>
+          </Link>
+        }
+      />
     );
   }
 
