@@ -19,7 +19,11 @@
     "seed": "tsx prisma/seed.ts"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["better-sqlite3", "@prisma/engines", "esbuild"]
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "@prisma/engines",
+      "esbuild"
+    ]
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
@@ -28,7 +32,8 @@
     "better-sqlite3": "^12.10.1",
     "next": "16.2.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
