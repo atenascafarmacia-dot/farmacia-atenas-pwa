@@ -5,7 +5,7 @@ import {
   OrderError,
   orderRepository,
 } from "@/repositories/order.repo";
-import { placeOrderSchema, type PlaceOrderInput } from "@/schemas/order.schema";
+import { type PlaceOrderInput,placeOrderSchema } from "@/schemas/order.schema";
 
 export type CreateOrderResult =
   | { ok: true; data: OrderDetailDto }
