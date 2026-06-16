@@ -58,15 +58,18 @@ export function CatalogSearch({
 
       {categories.length > 0 && (
         <nav aria-label="Filtrar por categoría">
-          <ul className="flex gap-2 overflow-x-auto overflow-y-hidden pb-1" role="list">
+          <ul
+            className="-mx-4 flex gap-2 overflow-x-auto overflow-y-hidden px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="list"
+          >
             <li>
               <button
                 onClick={() => handleCategory("")}
                 aria-pressed={activeCategory === ""}
-                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${
+                className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                   activeCategory === ""
-                    ? "bg-green-600 text-white"
-                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                    ? "border-primary-600 bg-primary-600 text-white"
+                    : "border-border bg-card text-muted hover:bg-primary-50 hover:text-primary-700"
                 }`}
               >
                 Todos
@@ -77,10 +80,10 @@ export function CatalogSearch({
                 <button
                   onClick={() => handleCategory(cat)}
                   aria-pressed={activeCategory === cat}
-                  className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${
+                  className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                     activeCategory === cat
-                      ? "bg-green-600 text-white"
-                      : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                      ? "border-primary-600 bg-primary-600 text-white"
+                      : "border-border bg-card text-muted hover:bg-primary-50 hover:text-primary-700"
                   }`}
                 >
                   {cat}
