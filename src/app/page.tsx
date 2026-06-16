@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { IdentifyForm } from "@/components/organisms/IdentifyForm";
+import { strings } from "@/lib/strings";
 import { getCurrentUser } from "@/services/session.service";
 
 export const metadata: Metadata = {
-  title: "Farmacia — Bienvenido",
+  title: `${strings.brand.name} — Bienvenido`,
 };
 
 export default async function HomePage() {
@@ -24,8 +25,8 @@ export default async function HomePage() {
             <Leaf className="h-9 w-9 text-white" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-ink">
-              Bienvenido a Farmacia
+            <h1 className="font-display text-2xl font-semibold text-ink">
+              Bienvenido a {strings.brand.name}
             </h1>
             <p className="mt-1 text-sm text-muted">
               Ingresa tu nombre y teléfono para continuar.
