@@ -1,3 +1,5 @@
+import { FileText } from "lucide-react";
+
 import { Badge } from "@/components/atoms/Badge";
 import { Price } from "@/components/atoms/Price";
 import { ProductThumb } from "@/components/atoms/ProductThumb";
@@ -13,7 +15,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const outOfStock = product.stock === 0;
 
   return (
-    <article className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm">
+    <article className="flex h-full flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft">
       <ProductThumb
         imageUrl={product.imageUrl}
         name={product.name}
@@ -23,23 +25,28 @@ export function ProductCard({ product }: ProductCardProps) {
       />
 
       <div className="flex flex-col gap-1.5">
-        <div className="flex flex-wrap gap-1">
-          <Badge variant="info">{product.category}</Badge>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Badge variant="neutral" className="tracking-wide [font-variant:small-caps]">
+            {product.category}
+          </Badge>
           {product.requiresPrescription && (
-            <Badge variant="warning">{strings.products.prescription}</Badge>
+            <Badge variant="warning">
+              <FileText className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
+              {strings.products.prescription}
+            </Badge>
           )}
           {outOfStock && <Badge variant="danger">{strings.products.outOfStock}</Badge>}
         </div>
 
-        <h3 className="text-sm font-semibold leading-tight text-zinc-900">{product.name}</h3>
+        <h3 className="text-sm font-semibold leading-tight text-ink">{product.name}</h3>
 
         {product.description && (
-          <p className="line-clamp-2 text-xs text-zinc-500">{product.description}</p>
+          <p className="line-clamp-2 text-xs text-muted">{product.description}</p>
         )}
       </div>
 
-      <div className="mt-auto flex items-center justify-between">
-        <Price amount={product.price} className="text-lg text-green-700" />
+      <div className="mt-auto flex items-center justify-between gap-2">
+        <Price amount={product.price} className="text-lg font-bold text-primary-700" />
         <AddToCartButton
           productId={product.id}
           name={product.name}

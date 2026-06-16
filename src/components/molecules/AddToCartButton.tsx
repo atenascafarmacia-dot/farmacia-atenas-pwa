@@ -1,5 +1,7 @@
 "use client";
 
+import { Plus } from "lucide-react";
+
 import { useCartStore } from "@/store/cart";
 
 interface AddToCartButtonProps {
@@ -18,11 +20,10 @@ export function AddToCartButton({
   outOfStock,
 }: AddToCartButtonProps) {
   const add = useCartStore((s) => s.add);
-  const inCart = useCartStore((s) => s.items.some((i) => i.productId === productId));
 
   if (outOfStock) {
     return (
-      <span className="shrink-0 rounded-xl border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-400">
+      <span className="inline-flex shrink-0 items-center rounded-full border border-border px-3 py-2 text-sm font-medium text-muted">
         Sin stock
       </span>
     );
@@ -33,24 +34,9 @@ export function AddToCartButton({
       type="button"
       onClick={() => add({ productId, name, price, imageUrl })}
       style={{ touchAction: "manipulation" }}
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${
-        inCart
-          ? "border border-green-600 text-green-600"
-          : "bg-green-600 text-white active:bg-green-700"
-      }`}
+      className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-primary-700 active:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={2}
-        stroke="currentColor"
-        width={14}
-        height={14}
-        aria-hidden="true"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
+      <Plus className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
       Agregar
     </button>
   );
