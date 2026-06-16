@@ -13,7 +13,7 @@ interface QRViewProps {
 export function QRView({ code, qrDataUrl }: QRViewProps) {
   return (
     <div className="flex flex-col items-center gap-5 rounded-2xl border border-border bg-card p-6 shadow-soft">
-      <Wordmark />
+      <Wordmark size={112} />
 
       <div className="rounded-2xl border border-border bg-surface p-3">
         {/* Data URL image: a plain <img> is correct here (no remote optimization). */}

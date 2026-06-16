@@ -1,7 +1,7 @@
-import { Leaf } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { Wordmark } from "@/components/atoms/Wordmark";
 import { IdentifyForm } from "@/components/organisms/IdentifyForm";
 import { strings } from "@/lib/strings";
 import { getCurrentUser } from "@/services/session.service";
@@ -18,12 +18,7 @@ export default async function HomePage() {
     <div className="flex min-h-[calc(100svh-56px)] flex-col items-center justify-center px-6 py-10">
       <div className="flex w-full max-w-sm flex-col gap-8">
         <header className="flex flex-col items-center gap-4 text-center">
-          <div
-            aria-hidden="true"
-            className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary-600 shadow-lg"
-          >
-            <Leaf className="h-9 w-9 text-white" strokeWidth={1.5} />
-          </div>
+          <Wordmark size={104} className="shadow-soft" />
           <div>
             <h1 className="font-display text-2xl font-semibold text-ink">
               Bienvenido a {strings.brand.name}

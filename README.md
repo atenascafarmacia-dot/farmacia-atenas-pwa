@@ -93,9 +93,11 @@ pnpm preview:network      # build + start escuchando en 0.0.0.0
 4. **Lighthouse → categoría _Progressive Web App_**: ejecútala; debe pasar "installable".
 5. En móvil (Android/Chrome): menú **⋮ → Añadir a pantalla de inicio**.
 
-> Nota: los íconos son SVG (192×192 y 512×512, `purpose: any maskable`). Si algún
-> navegador exige PNG para la instalación, exporta los SVG a PNG y actualiza
-> `public/manifest.json`.
+> Nota: los íconos son PNG generados desde el logo de la marca
+> (`public/logo.png`) — `public/icons/icon-192x192.png` y `icon-512x512.png`
+> (`purpose: any maskable`), más `app/icon.png` (favicon) y `app/apple-icon.png`.
+> El asset de origen es de baja resolución (150×150); para máxima nitidez en el
+> ícono 512 conviene regenerarlos desde un logo de mayor resolución.
 
 ## Gestión de productos (operador)
 

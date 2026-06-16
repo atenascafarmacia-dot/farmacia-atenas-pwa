@@ -26,6 +26,11 @@ export const strings = {
     close: "Cerrar",
   },
 
+  pwa: {
+    install: "Instalar app",
+    installAria: "Instalar la aplicación en tu dispositivo",
+  },
+
   validation: {
     required: "Este campo es obligatorio.",
     invalidEmail: "Correo electrónico inválido.",
@@ -121,6 +126,12 @@ export const strings = {
     codeLabel: "Código del pedido",
     codePlaceholder: "FARM-XXXXX",
     searchButton: "Buscar",
+    scanButton: "Escanear QR",
+    scanTitle: "Escanear código QR",
+    scanInstruction: "Apunta la cámara al QR del pedido.",
+    scanUnsupported: "Este navegador no permite escanear. Teclea el código manualmente.",
+    scanPermissionDenied: "Sin acceso a la cámara. Habilita el permiso o teclea el código.",
+    scanError: "No se pudo iniciar la cámara. Intenta de nuevo.",
     emptyTitle: "Busca un pedido",
     emptyMessage: "Escanea el QR del cliente o teclea el código para ver el pedido.",
     notFoundTitle: "Pedido no encontrado",
@@ -137,6 +148,25 @@ export const strings = {
     completeError: "No se pudo actualizar el pedido. Intenta de nuevo.",
     alreadyCompleted: "Este pedido ya fue completado.",
     manageProducts: "Gestionar productos",
+    viewOrders: "Ver pedidos",
+    orders: {
+      title: "Pedidos",
+      subtitle: "Consulta y gestiona los pedidos de la farmacia.",
+      searchPlaceholder: "Buscar por código",
+      filterAll: "Todos",
+      empty: "No hay pedidos",
+      emptyHint: "No se encontraron pedidos con estos filtros.",
+      itemsCount: (n: number) => `${n} ${n === 1 ? "producto" : "productos"}`,
+      pageInfo: (current: number, total: number) => `Página ${current} de ${total}`,
+      prev: "Anterior",
+      next: "Siguiente",
+      backToList: "Volver a pedidos",
+      detailTitle: "Detalle del pedido",
+      markProcessing: "Marcar en proceso",
+      markCancelled: "Cancelar pedido",
+      updateError: "No se pudo actualizar el estado. Intenta de nuevo.",
+      cancelledNote: "Este pedido fue cancelado.",
+    },
   },
 
   management: {

@@ -1,4 +1,4 @@
-import { Hourglass, Package, PackageX, ScanSearch } from "lucide-react";
+import { ClipboardList, Hourglass, Package, PackageX, ScanSearch } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,13 +43,22 @@ export default async function OperadorPage({
           <h1 className="text-xl font-bold text-ink">{strings.operator.title}</h1>
           <p className="mt-1 text-sm text-muted">{strings.operator.subtitle}</p>
         </div>
-        <Link
-          href="/operador/productos"
-          className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border border-primary-100 bg-primary-50 px-3.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-        >
-          <Package size={16} strokeWidth={2} aria-hidden="true" />
-          {strings.operator.manageProducts}
-        </Link>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <Link
+            href="/operador/ordenes"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-primary-100 bg-primary-50 px-3.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          >
+            <ClipboardList size={16} strokeWidth={2} aria-hidden="true" />
+            {strings.operator.viewOrders}
+          </Link>
+          <Link
+            href="/operador/productos"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-primary-100 bg-primary-50 px-3.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          >
+            <Package size={16} strokeWidth={2} aria-hidden="true" />
+            {strings.operator.manageProducts}
+          </Link>
+        </div>
       </header>
 
       <OperatorSearch initialCode={rawCode} />

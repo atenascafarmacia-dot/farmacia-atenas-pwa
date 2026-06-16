@@ -1,3 +1,4 @@
+import { Prisma } from "@/generated/prisma/client";
 import { type OrderStatus } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
@@ -10,6 +11,28 @@ export type OrderSummaryDto = {
   total: number;
   createdAt: Date;
   itemCount: number;
+};
+
+/** Compact row shown in the operator's order list. */
+export type OrderListItemDto = {
+  id: string;
+  code: string;
+  customerName: string;
+  status: OrderStatus;
+  total: number;
+  itemsCount: number;
+  createdAt: Date;
+};
+
+/** Filters shared by the list and count queries. */
+export type OrderQueryFilters = {
+  status?: OrderStatus;
+  code?: string;
+};
+
+export type OrderListFilters = OrderQueryFilters & {
+  skip: number;
+  take: number;
 };
 
 export type OrderItemDto = {
@@ -67,7 +90,48 @@ const SELECT_ORDER_DETAIL = {
   },
 } as const;
 
+/** Builds the Prisma `where` shared by the operator list and count queries. */
+function operatorWhere(filters: OrderQueryFilters): Prisma.OrderWhereInput {
+  const where: Prisma.OrderWhereInput = {};
+  if (filters.status) where.status = filters.status;
+  // Codes are stored/typed uppercase; SQLite LIKE is case-insensitive for ASCII.
+  if (filters.code) where.code = { contains: filters.code };
+  return where;
+}
+
 export const orderRepository = {
+  /** Paginated order list for the operator, newest first. */
+  findManyForOperator: async (filters: OrderListFilters): Promise<OrderListItemDto[]> => {
+    const orders = await prisma.order.findMany({
+      where: operatorWhere(filters),
+      select: {
+        id: true,
+        code: true,
+        status: true,
+        total: true,
+        createdAt: true,
+        user: { select: { name: true } },
+        _count: { select: { items: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: filters.skip,
+      take: filters.take,
+    });
+    return orders.map((o) => ({
+      id: o.id,
+      code: o.code,
+      customerName: o.user.name,
+      status: o.status,
+      total: o.total,
+      itemsCount: o._count.items,
+      createdAt: o.createdAt,
+    }));
+  },
+
+  /** Total orders matching the filters (for pagination). */
+  countOrders: (filters: OrderQueryFilters): Promise<number> =>
+    prisma.order.count({ where: operatorWhere(filters) }),
+
   findByUserId: async (userId: string): Promise<OrderSummaryDto[]> => {
     const orders = await prisma.order.findMany({
       where: { userId },

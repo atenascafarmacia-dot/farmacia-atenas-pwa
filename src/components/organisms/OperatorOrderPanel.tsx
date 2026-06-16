@@ -1,15 +1,8 @@
-import { Badge } from "@/components/atoms/Badge";
 import { Price } from "@/components/atoms/Price";
 import { CompleteOrderButton } from "@/components/molecules/CompleteOrderButton";
+import { OrderStatusBadge } from "@/components/molecules/OrderStatusBadge";
 import { strings } from "@/lib/strings";
-import type { OrderDetailDto, OrderStatus } from "@/repositories/order.repo";
-
-const STATUS_VARIANT: Record<OrderStatus, "warning" | "info" | "success" | "danger"> = {
-  PENDIENTE: "warning",
-  PROCESANDO: "info",
-  COMPLETADA: "success",
-  CANCELADA: "danger",
-};
+import type { OrderDetailDto } from "@/repositories/order.repo";
 
 interface OperatorOrderPanelProps {
   order: OrderDetailDto;
@@ -18,6 +11,9 @@ interface OperatorOrderPanelProps {
 /** Read-only order detail for the operator, plus the complete-order action. */
 export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
   const isCompleted = order.status === "COMPLETADA";
+  const isCancelled = order.status === "CANCELADA";
+  // Completed/cancelled orders are closed: no "complete" CTA.
+  const isClosed = isCompleted || isCancelled;
 
   return (
     <div className="flex flex-col gap-3">
@@ -25,9 +21,7 @@ export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
         <span className="font-mono text-lg font-bold tracking-widest text-ink">
           {order.code}
         </span>
-        <Badge variant={STATUS_VARIANT[order.status]}>
-          {strings.orders.statusLabel[order.status]}
-        </Badge>
+        <OrderStatusBadge status={order.status} />
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
@@ -78,9 +72,13 @@ export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
         </div>
       </div>
 
-      {isCompleted ? (
-        <p className="rounded-xl bg-success-bg px-4 py-3 text-center text-sm font-medium text-success">
-          {strings.operator.alreadyCompleted}
+      {isClosed ? (
+        <p
+          className={`rounded-xl px-4 py-3 text-center text-sm font-medium ${
+            isCancelled ? "bg-danger-bg text-danger" : "bg-success-bg text-success"
+          }`}
+        >
+          {isCancelled ? strings.operator.orders.cancelledNote : strings.operator.alreadyCompleted}
         </p>
       ) : (
         <CompleteOrderButton orderId={order.id} code={order.code} />

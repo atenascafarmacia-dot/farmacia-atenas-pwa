@@ -27,10 +27,11 @@ const baseConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           // Don't leak full URLs to third-party origins.
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          // The app uses no camera/mic/geolocation; deny them outright.
+          // Camera is allowed for same-origin only (operator QR scanner).
+          // Mic/geolocation remain denied outright.
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(self), microphone=(), geolocation=()",
           },
         ],
       },

@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { strings } from "@/lib/strings";
-import { completeOrder } from "@/services/order.service";
+import { updateOrderStatusSchema } from "@/schemas/order.schema";
+import { completeOrder, setOrderStatus } from "@/services/order.service";
 
 const completeOrderSchema = z.object({
   orderId: z.cuid(),
@@ -12,6 +13,14 @@ const completeOrderSchema = z.object({
 });
 
 export type CompleteOrderActionResult = { ok: true } | { ok: false; error: string };
+
+/** Revalidates every operator/customer view that renders the given order. */
+function revalidateOrderViews(code: string) {
+  revalidatePath("/operador");
+  revalidatePath("/operador/ordenes");
+  revalidatePath(`/operador/ordenes/${code}`);
+  revalidatePath(`/pedido/${code}`);
+}
 
 /** Marks an order as COMPLETADA and revalidates the views that show it. */
 export async function completeOrderAction(input: unknown): Promise<CompleteOrderActionResult> {
@@ -26,7 +35,27 @@ export async function completeOrderAction(input: unknown): Promise<CompleteOrder
     return { ok: false, error: strings.operator.completeError };
   }
 
-  revalidatePath("/operador");
-  revalidatePath(`/pedido/${parsed.data.code}`);
+  revalidateOrderViews(parsed.data.code);
+  return { ok: true };
+}
+
+export type UpdateOrderStatusActionResult = { ok: true } | { ok: false; error: string };
+
+/** Moves an order to PROCESANDO / CANCELADA (or any valid status) for the operator. */
+export async function updateOrderStatusAction(
+  input: unknown,
+): Promise<UpdateOrderStatusActionResult> {
+  const parsed = updateOrderStatusSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: strings.operator.orders.updateError };
+  }
+
+  try {
+    await setOrderStatus(parsed.data.orderId, parsed.data.status);
+  } catch {
+    return { ok: false, error: strings.operator.orders.updateError };
+  }
+
+  revalidateOrderViews(parsed.data.code);
   return { ok: true };
 }

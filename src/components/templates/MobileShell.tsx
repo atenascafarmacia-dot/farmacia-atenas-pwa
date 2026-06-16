@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 
 import { StoreHydrator } from "@/components/atoms/StoreHydrator";
 import { Wordmark } from "@/components/atoms/Wordmark";
+import { InstallButton } from "@/components/molecules/InstallButton";
 import { UserChip } from "@/components/molecules/UserChip";
 import { strings } from "@/lib/strings";
 import { selectCartCount, useCartStore } from "@/store/cart";
@@ -102,6 +103,7 @@ export function MobileShell({
         <main className="flex-1 pb-[56px]">{children}</main>
       </div>
       <BottomNav isOperator={isOperator} />
+      <InstallButton />
       <StoreHydrator />
     </div>
   );
