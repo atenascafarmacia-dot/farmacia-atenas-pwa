@@ -38,8 +38,10 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   // The operator nav entry is only shown to the configured operator.
   const user = await getCurrentUser();
@@ -54,6 +56,8 @@ export default async function RootLayout({
         <MobileShell isOperator={operator} userName={user?.name ?? null}>
           {children}
         </MobileShell>
+        {/* Parallel slot for intercepted routes (e.g. the product modal). */}
+        {modal}
       </body>
     </html>
   );

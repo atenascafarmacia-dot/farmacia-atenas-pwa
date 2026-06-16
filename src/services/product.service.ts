@@ -9,3 +9,7 @@ export async function getProducts(filters: ProductFilters = {}) {
 export async function getCategories(): Promise<string[]> {
   return productRepository.findCategories();
 }
+
+export async function getProductById(id: string) {
+  return productRepository.findById(id);
+}

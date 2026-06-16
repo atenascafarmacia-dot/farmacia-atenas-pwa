@@ -66,6 +66,17 @@ export const strings = {
     price: "Precio",
     frequentlyBought: "Comprados frecuentemente",
     emptyHint: "Intenta con otro término o categoría.",
+    detail: {
+      dialogLabel: "Detalle del producto",
+      quantity: "Cantidad",
+      available: "Disponible",
+      unavailable: "Agotado",
+      added: "Agregado al carrito",
+      related: "Productos relacionados",
+      notFoundTitle: "Producto no encontrado",
+      notFoundMessage:
+        "Este producto ya no está disponible en Farmacia Atenas. Explora el resto del catálogo.",
+    },
   },
 
   orders: {
