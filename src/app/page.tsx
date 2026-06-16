@@ -1,3 +1,4 @@
+import { Leaf } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -18,9 +19,9 @@ export default async function HomePage() {
         <header className="flex flex-col items-center gap-4 text-center">
           <div
             aria-hidden="true"
-            className="flex h-20 w-20 items-center justify-center rounded-3xl bg-green-600 shadow-lg"
+            className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary-600 shadow-lg"
           >
-            <span className="text-4xl">💊</span>
+            <Leaf className="h-9 w-9 text-white" strokeWidth={1.5} />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-zinc-900">

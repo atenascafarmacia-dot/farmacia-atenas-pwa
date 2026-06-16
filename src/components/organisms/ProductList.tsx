@@ -1,3 +1,5 @@
+import { PackageSearch } from "lucide-react";
+
 import { EmptyState } from "@/components/molecules/EmptyState";
 import { ProductCard } from "@/components/molecules/ProductCard";
 import { strings } from "@/lib/strings";
@@ -14,7 +16,7 @@ export function ProductList({ products, filters }: ProductListProps) {
     const isFiltered = Boolean(filters?.search ?? filters?.category);
     return (
       <EmptyState
-        icon="🔍"
+        icon={<PackageSearch className="h-7 w-7" strokeWidth={1.5} />}
         title={strings.products.empty}
         message={isFiltered ? strings.products.emptyHint : undefined}
       />

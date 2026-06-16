@@ -1,7 +1,8 @@
+import { Inbox } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface EmptyStateProps {
-  /** Emoji string or an icon node. */
+  /** A line icon node (e.g. a lucide icon). Defaults to an inbox. */
   icon?: ReactNode;
   title: string;
   message?: string;
@@ -10,9 +11,9 @@ interface EmptyStateProps {
   className?: string;
 }
 
-/** Reusable empty/placeholder state with an optional CTA. */
+/** Reusable empty/placeholder state with a branded icon and optional CTA. */
 export function EmptyState({
-  icon = "📭",
+  icon,
   title,
   message,
   action,
@@ -22,14 +23,15 @@ export function EmptyState({
     <div
       className={`flex flex-col items-center justify-center gap-3 py-16 text-center ${className}`}
     >
-      {icon && (
-        <span aria-hidden="true" className="text-5xl">
-          {icon}
-        </span>
-      )}
+      <span
+        aria-hidden="true"
+        className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-primary-600"
+      >
+        {icon ?? <Inbox className="h-7 w-7" strokeWidth={1.5} />}
+      </span>
       <div className="flex flex-col gap-1">
-        <p className="text-base font-semibold text-zinc-800">{title}</p>
-        {message && <p className="text-sm text-zinc-500">{message}</p>}
+        <p className="text-base font-semibold text-ink">{title}</p>
+        {message && <p className="text-sm text-muted">{message}</p>}
       </div>
       {action && <div className="mt-1">{action}</div>}
     </div>

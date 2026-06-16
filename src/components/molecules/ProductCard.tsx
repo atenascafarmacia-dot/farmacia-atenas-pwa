@@ -1,5 +1,6 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Price } from "@/components/atoms/Price";
+import { ProductThumb } from "@/components/atoms/ProductThumb";
 import { AddToCartButton } from "@/components/molecules/AddToCartButton";
 import { strings } from "@/lib/strings";
 import type { ProductDto } from "@/repositories/product.repo";
@@ -13,12 +14,13 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <article className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm">
-      <div
-        className="flex aspect-square w-full items-center justify-center rounded-xl bg-zinc-50"
-        aria-hidden="true"
-      >
-        <span className="text-5xl">💊</span>
-      </div>
+      <ProductThumb
+        imageUrl={product.imageUrl}
+        name={product.name}
+        category={product.category}
+        className="aspect-square w-full"
+        iconClassName="h-12 w-12"
+      />
 
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-wrap gap-1">

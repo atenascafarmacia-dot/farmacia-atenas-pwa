@@ -1,3 +1,4 @@
+import { Hourglass, PackageX, ScanSearch } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -45,7 +46,7 @@ export default async function OperadorPage({
 
       {!rawCode && (
         <EmptyState
-          icon="🔎"
+          icon={<ScanSearch className="h-7 w-7" strokeWidth={1.5} />}
           title={strings.operator.emptyTitle}
           message={strings.operator.emptyMessage}
         />
@@ -54,7 +55,7 @@ export default async function OperadorPage({
       {limited && (
         <div role="alert">
           <EmptyState
-            icon="⏳"
+            icon={<Hourglass className="h-7 w-7" strokeWidth={1.5} />}
             title={strings.operator.rateLimitedTitle}
             message={strings.operator.rateLimitedMessage}
           />
@@ -64,7 +65,7 @@ export default async function OperadorPage({
       {rawCode && !limited && !order && (
         <div role="alert">
           <EmptyState
-            icon="❌"
+            icon={<PackageX className="h-7 w-7" strokeWidth={1.5} />}
             title={strings.operator.notFoundTitle}
             message={strings.operator.notFound}
           />

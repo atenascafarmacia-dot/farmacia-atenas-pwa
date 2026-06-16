@@ -1,5 +1,6 @@
 "use client";
 
+import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -8,6 +9,7 @@ import { createOrderAction } from "@/app/_actions/order.action";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Price } from "@/components/atoms/Price";
+import { ProductThumb } from "@/components/atoms/ProductThumb";
 import { EmptyState } from "@/components/molecules/EmptyState";
 import { QuantityStepper } from "@/components/molecules/QuantityStepper";
 import { strings } from "@/lib/strings";
@@ -41,7 +43,7 @@ export function CartList() {
   if (items.length === 0) {
     return (
       <EmptyState
-        icon="🛒"
+        icon={<ShoppingCart className="h-7 w-7" strokeWidth={1.5} />}
         title={strings.cart.empty}
         message={strings.cart.emptyHint}
         action={
@@ -58,12 +60,12 @@ export function CartList() {
       <ul className="flex flex-col divide-y divide-zinc-100" aria-label="Productos en el carrito">
         {items.map((item) => (
           <li key={item.productId} className="flex items-start gap-3 py-4">
-            <div
-              className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-zinc-100"
-              aria-hidden="true"
-            >
-              <span className="text-2xl">💊</span>
-            </div>
+            <ProductThumb
+              imageUrl={item.imageUrl}
+              name={item.name}
+              className="h-16 w-16 flex-shrink-0"
+              iconClassName="h-7 w-7"
+            />
 
             <div className="flex flex-1 flex-col gap-2 min-w-0">
               <div className="flex items-start justify-between gap-2">

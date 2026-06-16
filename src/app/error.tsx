@@ -1,5 +1,6 @@
 "use client";
 
+import { TriangleAlert } from "lucide-react";
 import { useEffect } from "react";
 
 import { Button } from "@/components/atoms/Button";
@@ -19,8 +20,11 @@ export default function Error({
 
   return (
     <div className="flex min-h-[calc(100svh-56px)] flex-col items-center justify-center gap-5 px-6 text-center">
-      <span aria-hidden="true" className="text-5xl">
-        ⚠️
+      <span
+        aria-hidden="true"
+        className="flex h-16 w-16 items-center justify-center rounded-full bg-danger-bg text-danger"
+      >
+        <TriangleAlert className="h-7 w-7" strokeWidth={1.5} />
       </span>
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-bold text-zinc-900">{strings.common.errorTitle}</h1>
