@@ -4,12 +4,16 @@ import type { ButtonHTMLAttributes } from "react";
 
 import { Spinner } from "@/components/atoms/Spinner";
 
-type Variant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+type Variant = "primary" | "soft" | "secondary" | "outline" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
+  // Solid fill — reserved for the primary screen CTA (checkout, complete order).
   primary:
     "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-700 focus-visible:ring-primary-500",
+  // Tonal fill — calmer alternative for repeated / secondary actions.
+  soft:
+    "border border-primary-100 bg-primary-50 text-primary-700 hover:bg-primary-100 active:scale-95 focus-visible:ring-primary-500",
   secondary:
     "bg-primary-50 text-primary-700 hover:bg-primary-100 active:bg-primary-100 focus-visible:ring-primary-500",
   outline:
@@ -45,7 +49,7 @@ export function Button({
     <button
       type="button"
       disabled={disabled ?? loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-xl font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     >
       {loading && <Spinner size="sm" />}

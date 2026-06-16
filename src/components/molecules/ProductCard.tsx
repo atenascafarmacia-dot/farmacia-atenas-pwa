@@ -45,7 +45,7 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-2">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
         <Price amount={product.price} className="text-lg font-bold text-primary-700" />
         <AddToCartButton
           productId={product.id}
