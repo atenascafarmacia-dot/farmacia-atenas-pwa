@@ -28,7 +28,7 @@ export function IdentifyForm() {
   return (
     <form action={formAction} noValidate className="flex flex-col gap-4">
       {state?.generalError && (
-        <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
+        <p role="alert" className="rounded-xl bg-danger-bg p-3 text-sm text-danger">
           {state.generalError}
         </p>
       )}

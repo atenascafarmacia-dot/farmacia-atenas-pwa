@@ -12,7 +12,7 @@ export function RecommendationsSection({ products }: RecommendationsSectionProps
 
   return (
     <section aria-labelledby="recommendations-title" className="flex flex-col gap-2">
-      <h2 id="recommendations-title" className="text-sm font-semibold text-zinc-900">
+      <h2 id="recommendations-title" className="text-sm font-semibold text-ink">
         {strings.products.frequentlyBought}
       </h2>
       <ul className="flex gap-3 overflow-x-auto pb-1" role="list">

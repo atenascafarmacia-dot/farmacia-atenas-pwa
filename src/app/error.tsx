@@ -27,8 +27,8 @@ export default function Error({
         <TriangleAlert className="h-7 w-7" strokeWidth={1.5} />
       </span>
       <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-bold text-zinc-900">{strings.common.errorTitle}</h1>
-        <p className="text-sm text-zinc-500">{strings.common.error}</p>
+        <h1 className="text-xl font-bold text-ink">{strings.common.errorTitle}</h1>
+        <p className="text-sm text-muted">{strings.common.error}</p>
       </div>
       <Button onClick={() => reset()}>{strings.common.retry}</Button>
     </div>

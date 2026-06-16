@@ -24,10 +24,10 @@ export default async function HomePage() {
             <Leaf className="h-9 w-9 text-white" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">
+            <h1 className="text-2xl font-bold text-ink">
               Bienvenido a Farmacia
             </h1>
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-1 text-sm text-muted">
               Ingresa tu nombre y teléfono para continuar.
             </p>
           </div>

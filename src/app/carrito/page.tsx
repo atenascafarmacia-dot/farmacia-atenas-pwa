@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function CarritoPage() {
   return (
     <section className="flex flex-col px-4 pb-6 pt-4">
-      <h1 className="mb-4 text-xl font-bold text-zinc-900">Carrito</h1>
+      <h1 className="mb-4 text-xl font-bold text-ink">Carrito</h1>
       <CartList />
     </section>
   );

@@ -16,7 +16,7 @@ export function Spinner({ size = "md", className = "" }: SpinnerProps) {
     <span
       role="status"
       aria-label="Cargando"
-      className={`block animate-spin rounded-full border-zinc-200 border-t-green-600 ${sizeClasses[size]} ${className}`}
+      className={`block animate-spin rounded-full border-border border-t-primary-600 ${sizeClasses[size]} ${className}`}
     />
   );
 }

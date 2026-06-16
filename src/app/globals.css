@@ -24,10 +24,11 @@
   --color-ink: #16201c;
   --color-muted: #5e6b64;
 
-  /* Semantic — text/icon color + matching background */
-  --color-success: #15803d;
+  /* Semantic — text/icon color + matching background.
+     success/warning darkened so badge text hits WCAG AA (4.5:1) on its bg. */
+  --color-success: #147038;
   --color-success-bg: #dcf0e4;
-  --color-warning: #9a6b16;
+  --color-warning: #7c560f;
   --color-warning-bg: #f3e9ce;
   --color-danger: #b42318;
   --color-danger-bg: #fbe3e1;

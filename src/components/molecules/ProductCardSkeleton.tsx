@@ -4,7 +4,7 @@ export function ProductCardSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4"
+      className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft"
     >
       <Skeleton className="aspect-square w-full rounded-xl" />
       <div className="flex flex-col gap-2">

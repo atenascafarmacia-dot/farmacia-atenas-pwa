@@ -96,7 +96,7 @@ export function MobileShell({
   userName = null,
 }: MobileShellProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50">
+    <div className="flex min-h-screen flex-col bg-surface">
       <div className="mx-auto flex w-full max-w-[430px] flex-1 flex-col">
         {userName && <TopBar userName={userName} />}
         <main className="flex-1 pb-[56px]">{children}</main>

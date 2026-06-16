@@ -38,8 +38,8 @@ export default async function OperadorPage({
   return (
     <section className="flex flex-col gap-5 px-4 pb-6 pt-4">
       <header>
-        <h1 className="text-xl font-bold text-zinc-900">{strings.operator.title}</h1>
-        <p className="mt-1 text-sm text-zinc-500">{strings.operator.subtitle}</p>
+        <h1 className="text-xl font-bold text-ink">{strings.operator.title}</h1>
+        <p className="mt-1 text-sm text-muted">{strings.operator.subtitle}</p>
       </header>
 
       <OperatorSearch initialCode={rawCode} />

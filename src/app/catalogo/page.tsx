@@ -44,7 +44,7 @@ export default async function CatalogoPage({
 
   return (
     <section className="flex flex-col gap-4 px-4 pb-6 pt-4">
-      <h1 className="text-xl font-bold text-zinc-900">Catálogo</h1>
+      <h1 className="text-xl font-bold text-ink">Catálogo</h1>
 
       {showRecommendations && <RecommendationsSection products={recommendations} />}
 

@@ -13,14 +13,14 @@ export default function NotFound() {
         <Compass className="h-9 w-9" strokeWidth={1.5} />
       </span>
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-zinc-900">
+        <h1 className="text-2xl font-bold text-ink">
           {strings.common.notFound.title}
         </h1>
-        <p className="text-sm text-zinc-500">{strings.common.notFound.message}</p>
+        <p className="text-sm text-muted">{strings.common.notFound.message}</p>
       </div>
       <Link
         href="/catalogo"
-        className="flex min-h-[44px] items-center justify-center rounded-xl bg-green-600 px-6 text-sm font-medium text-white transition-colors hover:bg-green-700"
+        className="flex min-h-[44px] items-center justify-center rounded-xl bg-primary-600 px-6 text-sm font-medium text-white transition-colors hover:bg-primary-700"
       >
         {strings.common.goCatalog}
       </Link>
