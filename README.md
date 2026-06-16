@@ -97,6 +97,20 @@ pnpm preview:network      # build + start escuchando en 0.0.0.0
 > navegador exige PNG para la instalación, exporta los SVG a PNG y actualiza
 > `public/manifest.json`.
 
+## Gestión de productos (operador)
+
+En `/operador/productos` el operador puede **crear, editar y eliminar** productos.
+La eliminación es **soft-delete** por defecto (`isActive=false`) para preservar el
+historial de pedidos; solo se borra físicamente un producto si **ninguna orden lo
+referencia**. El catálogo y las recomendaciones solo muestran productos con
+`isActive: true`.
+
+> ⚠️ **Seguridad en producción:** como el MVP no tiene autenticación real, esta área
+> solo está protegida por el mismo _gate_ de `OPERATOR_PHONE` que `/operador` (vía
+> `app/operador/productos/layout.tsx`). **Antes de ir a producción debe protegerse con
+> autenticación/autorización reales** (sesión de servidor, rol de operador), ya que
+> permite mutar el catálogo.
+
 ## Arquitectura por capas
 
 Regla de oro: **solo los repositorios importan Prisma**. Ninguna página o componente

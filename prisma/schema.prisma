@@ -23,6 +23,7 @@ model Product {
   imageUrl             String?
   category             String
   requiresPrescription Boolean     @default(false)
+  isActive             Boolean     @default(true)
   createdAt            DateTime    @default(now())
   updatedAt            DateTime    @updatedAt
   orderItems           OrderItem[]

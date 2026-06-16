@@ -9,6 +9,7 @@ const SELECT_PRODUCT = {
   imageUrl: true,
   category: true,
   requiresPrescription: true,
+  isActive: true,
   createdAt: true,
 } as const;
 
@@ -21,7 +22,19 @@ export type ProductDto = {
   imageUrl: string | null;
   category: string;
   requiresPrescription: boolean;
+  isActive: boolean;
   createdAt: Date;
+};
+
+/** Writable product fields (create / update). */
+export type ProductWriteData = {
+  name: string;
+  description: string | null;
+  price: number;
+  stock: number;
+  imageUrl: string | null;
+  category: string;
+  requiresPrescription: boolean;
 };
 
 export type ProductFilters = {
@@ -31,9 +44,12 @@ export type ProductFilters = {
 };
 
 export const productRepository = {
+  // ---- Public reads: active products only ----
+
   findAll: (filters: ProductFilters = {}): Promise<ProductDto[]> =>
     prisma.product.findMany({
       where: {
+        isActive: true,
         ...(filters.category && { category: filters.category }),
         ...(filters.requiresPrescription !== undefined && {
           requiresPrescription: filters.requiresPrescription,
@@ -50,13 +66,13 @@ export const productRepository = {
     }),
 
   findById: (id: string): Promise<ProductDto | null> =>
-    prisma.product.findUnique({ where: { id }, select: SELECT_PRODUCT }),
+    prisma.product.findFirst({ where: { id, isActive: true }, select: SELECT_PRODUCT }),
 
-  /** Fetches products by IDs, preserving the given order (e.g. a ranking). */
+  /** Fetches active products by IDs, preserving the given order (e.g. a ranking). */
   findByIds: async (ids: string[]): Promise<ProductDto[]> => {
     if (ids.length === 0) return [];
     const products = await prisma.product.findMany({
-      where: { id: { in: ids } },
+      where: { id: { in: ids }, isActive: true },
       select: SELECT_PRODUCT,
     });
     const byId = new Map(products.map((p) => [p.id, p]));
@@ -67,11 +83,50 @@ export const productRepository = {
 
   findCategories: (): Promise<string[]> =>
     prisma.product
-      .findMany({ select: { category: true }, distinct: ["category"], orderBy: { category: "asc" } })
+      .findMany({
+        where: { isActive: true },
+        select: { category: true },
+        distinct: ["category"],
+        orderBy: { category: "asc" },
+      })
       .then((rows) => rows.map((r) => r.category)),
 
   decrementStock: (id: string, quantity: number): Promise<void> =>
     prisma.product
       .update({ where: { id }, data: { stock: { decrement: quantity } } })
       .then(() => undefined),
+
+  // ---- Management reads: include inactive products ----
+
+  findAllForManagement: (): Promise<ProductDto[]> =>
+    prisma.product.findMany({
+      select: SELECT_PRODUCT,
+      orderBy: [{ isActive: "desc" }, { name: "asc" }],
+    }),
+
+  findByIdForManagement: (id: string): Promise<ProductDto | null> =>
+    prisma.product.findUnique({ where: { id }, select: SELECT_PRODUCT }),
+
+  countOrderItems: (id: string): Promise<number> =>
+    prisma.orderItem.count({ where: { productId: id } }),
+
+  // ---- Writes ----
+
+  create: (data: ProductWriteData): Promise<ProductDto> =>
+    prisma.product.create({ data, select: SELECT_PRODUCT }),
+
+  update: (id: string, data: ProductWriteData): Promise<ProductDto> =>
+    prisma.product.update({ where: { id }, data, select: SELECT_PRODUCT }),
+
+  /** Soft delete: keep the row (and its order history) but hide it. */
+  softDelete: (id: string): Promise<ProductDto> =>
+    prisma.product.update({
+      where: { id },
+      data: { isActive: false },
+      select: SELECT_PRODUCT,
+    }),
+
+  /** Hard delete: only safe when the product is referenced by no order. */
+  hardDelete: (id: string): Promise<void> =>
+    prisma.product.delete({ where: { id } }).then(() => undefined),
 };
