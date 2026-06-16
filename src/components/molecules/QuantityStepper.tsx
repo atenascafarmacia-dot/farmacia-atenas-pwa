@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
+import { Minus, Plus } from "lucide-react";
 
 interface QuantityStepperProps {
   value: number;
@@ -18,35 +17,40 @@ export function QuantityStepper({
   max = 99,
   disabled = false,
 }: QuantityStepperProps) {
+  const stepClass =
+    "flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:pointer-events-none disabled:opacity-40";
+
   return (
-    <div className="flex items-center gap-1" role="group" aria-label="Cantidad">
-      <Button
-        variant="outline"
-        size="sm"
+    <div
+      className="inline-flex items-center rounded-full border border-border bg-card shadow-soft"
+      role="group"
+      aria-label="Cantidad"
+    >
+      <button
+        type="button"
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={disabled || value <= min}
         aria-label="Reducir cantidad"
-        className="h-11 w-11 p-0"
+        className={stepClass}
       >
-        <Icon name="minus" size={16} />
-      </Button>
+        <Minus size={16} strokeWidth={2.5} aria-hidden="true" />
+      </button>
       <span
-        className="w-10 text-center text-base font-bold text-zinc-900 tabular-nums"
+        className="w-9 text-center text-base font-bold tabular-nums text-ink"
         aria-live="polite"
         aria-atomic="true"
       >
         {value}
       </span>
-      <Button
-        variant="outline"
-        size="sm"
+      <button
+        type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={disabled || value >= max}
         aria-label="Aumentar cantidad"
-        className="h-11 w-11 p-0"
+        className={stepClass}
       >
-        <Icon name="plus" size={16} />
-      </Button>
+        <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
+      </button>
     </div>
   );
 }

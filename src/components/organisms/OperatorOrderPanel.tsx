@@ -20,9 +20,9 @@ export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
   const isCompleted = order.status === "COMPLETADA";
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-4">
-        <span className="font-mono text-lg font-bold tracking-widest text-zinc-900">
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-soft">
+        <span className="font-mono text-lg font-bold tracking-widest text-ink">
           {order.code}
         </span>
         <Badge variant={STATUS_VARIANT[order.status]}>
@@ -30,56 +30,56 @@ export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
         </Badge>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-900">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
           {strings.operator.customer}
         </h2>
-        <dl className="flex flex-col gap-1 text-sm">
+        <dl className="flex flex-col gap-1.5 text-sm">
           <div className="flex justify-between gap-3">
-            <dt className="text-zinc-500">{strings.operator.customer}</dt>
-            <dd className="text-right font-medium text-zinc-900">{order.user.name}</dd>
+            <dt className="text-muted">{strings.operator.customer}</dt>
+            <dd className="text-right font-medium text-ink">{order.user.name}</dd>
           </div>
           <div className="flex justify-between gap-3">
-            <dt className="text-zinc-500">{strings.operator.phone}</dt>
-            <dd className="text-right text-zinc-900">{order.user.phone}</dd>
+            <dt className="text-muted">{strings.operator.phone}</dt>
+            <dd className="text-right text-ink">{order.user.phone}</dd>
           </div>
           {order.user.email && (
             <div className="flex justify-between gap-3">
-              <dt className="text-zinc-500">{strings.operator.email}</dt>
-              <dd className="text-right text-zinc-900">{order.user.email}</dd>
+              <dt className="text-muted">{strings.operator.email}</dt>
+              <dd className="text-right text-ink">{order.user.email}</dd>
             </div>
           )}
         </dl>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-900">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
           {strings.operator.items}
         </h2>
-        <ul className="flex flex-col divide-y divide-zinc-100" role="list">
+        <ul className="flex flex-col divide-y divide-border" role="list">
           {order.items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-3 py-2">
-              <span className="flex-1 text-sm text-zinc-700">
+              <span className="flex-1 text-sm text-ink">
                 {item.product.name}
-                <span className="ml-1 text-zinc-400">×{item.quantity}</span>
+                <span className="ml-1 text-muted">×{item.quantity}</span>
               </span>
               <Price
                 amount={item.unitPrice * item.quantity}
-                className="text-sm text-zinc-900"
+                className="text-sm text-ink"
               />
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex items-center justify-between border-t border-zinc-200 pt-3">
-          <span className="text-sm font-semibold text-zinc-900">
+        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+          <span className="text-sm font-semibold text-ink">
             {strings.operator.total}
           </span>
-          <Price amount={order.total} className="text-lg text-zinc-900" />
+          <Price amount={order.total} className="text-lg font-bold text-primary-700" />
         </div>
       </div>
 
       {isCompleted ? (
-        <p className="rounded-xl bg-green-50 px-4 py-3 text-center text-sm font-medium text-green-700">
+        <p className="rounded-xl bg-success-bg px-4 py-3 text-center text-sm font-medium text-success">
           {strings.operator.alreadyCompleted}
         </p>
       ) : (

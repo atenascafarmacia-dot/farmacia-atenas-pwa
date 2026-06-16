@@ -56,10 +56,10 @@ export function CartList() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <ul className="flex flex-col divide-y divide-zinc-100" aria-label="Productos en el carrito">
+    <div className="flex flex-col gap-3">
+      <ul className="flex flex-col divide-y divide-border" aria-label="Productos en el carrito">
         {items.map((item) => (
-          <li key={item.productId} className="flex items-start gap-3 py-4">
+          <li key={item.productId} className="flex items-start gap-3 py-3">
             <ProductThumb
               imageUrl={item.imageUrl}
               name={item.name}
@@ -69,13 +69,13 @@ export function CartList() {
 
             <div className="flex flex-1 flex-col gap-2 min-w-0">
               <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-medium leading-tight text-zinc-900 line-clamp-2">
+                <p className="line-clamp-2 text-sm font-semibold leading-tight text-ink">
                   {item.name}
                 </p>
                 <button
                   onClick={() => remove(item.productId)}
                   aria-label={`Eliminar ${item.name} del carrito`}
-                  className="flex-shrink-0 rounded-lg p-1 text-zinc-400 transition-colors hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                  className="flex-shrink-0 rounded-lg p-1 text-muted transition-colors hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
                 >
                   <Icon name="x" size={16} />
                 </button>
@@ -90,12 +90,12 @@ export function CartList() {
                 />
                 <Price
                   amount={item.price * item.quantity}
-                  className="text-base text-green-700"
+                  className="text-base font-bold text-primary-700"
                 />
               </div>
 
               {item.quantity > 1 && (
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-muted">
                   <Price amount={item.price} /> c/u
                 </p>
               )}
@@ -104,13 +104,13 @@ export function CartList() {
         ))}
       </ul>
 
-      <div className="sticky bottom-0 -mx-4 border-t border-zinc-100 bg-white px-4 pb-4 pt-3">
-        <div className="mb-4 flex items-center justify-between">
-          <span className="text-base font-semibold text-zinc-900">{strings.cart.total}</span>
-          <Price amount={total} className="text-xl text-green-700" />
+      <div className="sticky bottom-0 -mx-4 border-t border-border bg-card px-4 pb-4 pt-3">
+        <div className="mb-3 flex items-center justify-between rounded-xl bg-primary-50 px-4 py-3">
+          <span className="text-sm font-semibold text-ink">{strings.cart.total}</span>
+          <Price amount={total} className="text-xl font-bold text-primary-700" />
         </div>
         {error && (
-          <p role="alert" className="mb-3 text-sm text-red-600">
+          <p role="alert" className="mb-3 text-sm text-danger">
             {error}
           </p>
         )}

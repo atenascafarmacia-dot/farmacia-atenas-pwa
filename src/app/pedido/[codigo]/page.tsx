@@ -31,43 +31,43 @@ export default async function PedidoPage({ params }: { params: Params }) {
 
   return (
     <section className="flex flex-col gap-5 px-4 pb-6 pt-4">
-      <p className="text-center text-base font-semibold text-zinc-900">
+      <p className="text-center text-base font-semibold text-ink">
         {strings.orders.receipt.showAtCounter}
       </p>
 
       <QRView code={order.code} qrDataUrl={qrDataUrl} />
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-900">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+        <h2 className="mb-3 text-sm font-semibold text-ink">
           {strings.orders.receipt.summary}
         </h2>
 
-        <ul className="flex flex-col divide-y divide-zinc-100" role="list">
+        <ul className="flex flex-col divide-y divide-border" role="list">
           {order.items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-3 py-2">
-              <span className="flex-1 text-sm text-zinc-700">
+              <span className="flex-1 text-sm text-ink">
                 {item.product.name}
-                <span className="ml-1 text-zinc-400">×{item.quantity}</span>
+                <span className="ml-1 text-muted">×{item.quantity}</span>
               </span>
               <Price
                 amount={item.unitPrice * item.quantity}
-                className="text-sm text-zinc-900"
+                className="text-sm text-ink"
               />
             </li>
           ))}
         </ul>
 
-        <div className="mt-3 flex items-center justify-between border-t border-zinc-200 pt-3">
-          <span className="text-sm font-semibold text-zinc-900">
+        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+          <span className="text-sm font-semibold text-ink">
             {strings.orders.receipt.total}
           </span>
-          <Price amount={order.total} className="text-lg text-zinc-900" />
+          <Price amount={order.total} className="text-lg font-bold text-primary-700" />
         </div>
       </div>
 
       <Link
         href="/catalogo"
-        className="flex min-h-[44px] items-center justify-center rounded-xl border border-zinc-300 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
+        className="flex min-h-[44px] items-center justify-center rounded-xl border border-border text-sm font-medium text-ink transition-colors hover:bg-primary-50"
       >
         {strings.orders.receipt.backToCatalog}
       </Link>
