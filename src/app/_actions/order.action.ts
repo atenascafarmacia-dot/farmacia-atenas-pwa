@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 
 import { strings } from "@/lib/strings";
-import { cartSchema } from "@/schemas/cart.schema";
 import { createOrder } from "@/services/order.service";
 import { getCurrentUser } from "@/services/session.service";
 
@@ -12,17 +11,15 @@ export type CreateOrderActionResult =
   | { ok: false; error: string };
 
 /**
- * Places an order for the current session. Returns the order code so the
+ * Places an order for the current session from the checkout payload (cart items
+ * plus delivery / payment / shipping details). Returns the order code so the
  * client can clear its cart and navigate to /pedido/[code]; we don't redirect
- * here because the cart lives in the client store.
+ * here because the cart lives in the client store. All fields are validated and
+ * the total is recomputed server-side in the service/repository.
  */
-export async function createOrderAction(items: unknown): Promise<CreateOrderActionResult> {
-  const parsedItems = cartSchema.safeParse(items);
-  if (!parsedItems.success) {
-    return {
-      ok: false,
-      error: parsedItems.error.issues[0]?.message ?? strings.orders.create.invalid,
-    };
+export async function createOrderAction(input: unknown): Promise<CreateOrderActionResult> {
+  if (typeof input !== "object" || input === null) {
+    return { ok: false, error: strings.orders.create.invalid };
   }
 
   const user = await getCurrentUser();
@@ -30,7 +27,7 @@ export async function createOrderAction(items: unknown): Promise<CreateOrderActi
     return { ok: false, error: strings.orders.create.notIdentified };
   }
 
-  const result = await createOrder({ userId: user.id, items: parsedItems.data });
+  const result = await createOrder({ ...(input as Record<string, unknown>), userId: user.id });
   if (!result.ok) {
     return result;
   }

@@ -1,6 +1,15 @@
 "use client";
 
-import { LayoutGrid, type LucideIcon, ShoppingCart, Store } from "lucide-react";
+import {
+  ClipboardList,
+  LayoutGrid,
+  type LucideIcon,
+  MapPin,
+  Package,
+  ShoppingCart,
+  Store,
+  Tags,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -12,12 +21,25 @@ import { UserChip } from "@/components/molecules/UserChip";
 import { strings } from "@/lib/strings";
 import { selectCartCount, useCartStore } from "@/store/cart";
 
-type NavItem = { href: string; label: string; Icon: LucideIcon; operatorOnly?: boolean };
+type NavItem = {
+  href: string;
+  label: string;
+  Icon: LucideIcon;
+  operatorOnly?: boolean;
+  customerOnly?: boolean;
+};
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/catalogo", label: strings.nav.catalog, Icon: LayoutGrid },
-  { href: "/carrito", label: strings.nav.cart, Icon: ShoppingCart },
+  // Customer menu.
+  { href: "/catalogo", label: strings.nav.catalog, Icon: LayoutGrid, customerOnly: true },
+  { href: "/carrito", label: strings.nav.cart, Icon: ShoppingCart, customerOnly: true },
+  // Addresses are a customer (shipping) feature; operators don't need them.
+  { href: "/direcciones", label: strings.nav.addresses, Icon: MapPin, customerOnly: true },
+  // Operator menu.
   { href: "/operador", label: strings.nav.operator, Icon: Store, operatorOnly: true },
+  { href: "/operador/ordenes", label: strings.nav.orders, Icon: ClipboardList, operatorOnly: true },
+  { href: "/operador/productos", label: strings.nav.products, Icon: Package, operatorOnly: true },
+  { href: "/operador/categorias", label: strings.nav.categories, Icon: Tags, operatorOnly: true },
 ];
 
 function CartBadge() {
@@ -37,7 +59,17 @@ function CartBadge() {
 
 function BottomNav({ isOperator }: { isOperator: boolean }) {
   const pathname = usePathname();
-  const items = NAV_ITEMS.filter((item) => !item.operatorOnly || isOperator);
+  const items = NAV_ITEMS.filter((item) => {
+    if (item.operatorOnly) return isOperator;
+    if (item.customerOnly) return !isOperator;
+    return true;
+  });
+
+  // Highlight the single best match: the longest href that prefixes the path,
+  // so /operador/ordenes activates "Órdenes" rather than the "/operador" root.
+  const activeHref = items
+    .filter((item) => pathname === item.href || pathname.startsWith(item.href + "/"))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
     <nav
@@ -46,7 +78,7 @@ function BottomNav({ isOperator }: { isOperator: boolean }) {
     >
       <ul className="flex" role="list">
         {items.map(({ href, label, Icon }) => {
-          const isActive = pathname === href || pathname.startsWith(href + "/");
+          const isActive = href === activeHref;
           return (
             <li key={href} className="flex-1">
               <Link
@@ -96,13 +128,16 @@ export function MobileShell({
   isOperator = false,
   userName = null,
 }: MobileShellProps) {
+  // Unauthenticated users only see the login screen — no top bar or bottom nav.
+  const isAuthenticated = Boolean(userName);
+
   return (
     <div className="flex min-h-screen flex-col bg-surface">
       <div className="mx-auto flex w-full max-w-[430px] flex-1 flex-col">
-        {userName && <TopBar userName={userName} />}
-        <main className="flex-1 pb-[56px]">{children}</main>
+        {isAuthenticated && <TopBar userName={userName!} />}
+        <main className={`flex-1 ${isAuthenticated ? "pb-[56px]" : ""}`}>{children}</main>
       </div>
-      <BottomNav isOperator={isOperator} />
+      {isAuthenticated && <BottomNav isOperator={isOperator} />}
       <InstallButton />
       <StoreHydrator />
     </div>

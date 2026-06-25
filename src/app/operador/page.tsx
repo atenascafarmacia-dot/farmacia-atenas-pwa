@@ -1,4 +1,4 @@
-import { ClipboardList, Hourglass, Package, PackageX, ScanSearch } from "lucide-react";
+import { ClipboardList, Hourglass, Package, PackageX, ScanSearch, Tags } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -57,6 +57,13 @@ export default async function OperadorPage({
           >
             <Package size={16} strokeWidth={2} aria-hidden="true" />
             {strings.operator.manageProducts}
+          </Link>
+          <Link
+            href="/operador/categorias"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-primary-100 bg-primary-50 px-3.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          >
+            <Tags size={16} strokeWidth={2} aria-hidden="true" />
+            {strings.operator.manageCategories}
           </Link>
         </div>
       </header>

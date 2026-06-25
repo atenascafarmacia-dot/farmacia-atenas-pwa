@@ -26,7 +26,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <ProductThumb
           imageUrl={product.imageUrl}
           name={product.name}
-          category={product.category}
+          category={product.category.name}
           className="aspect-square w-full"
           iconClassName="h-12 w-12"
         />
@@ -34,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-1.5">
             <Badge variant="neutral" className="tracking-wide [font-variant:small-caps]">
-              {product.category}
+              {product.category.name}
             </Badge>
             {product.requiresPrescription && (
               <Badge variant="warning">

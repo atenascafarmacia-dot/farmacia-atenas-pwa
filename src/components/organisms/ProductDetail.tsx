@@ -32,7 +32,7 @@ export function ProductDetail({ product, related }: ProductDetailProps) {
       <ProductThumb
         imageUrl={product.imageUrl}
         name={product.name}
-        category={product.category}
+        category={product.category.name}
         className="aspect-square w-full"
         iconClassName="h-20 w-20"
       />
@@ -40,7 +40,7 @@ export function ProductDetail({ product, related }: ProductDetailProps) {
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="neutral" className="tracking-wide [font-variant:small-caps]">
-            {product.category}
+            {product.category.name}
           </Badge>
           {product.requiresPrescription && (
             <Badge variant="warning">
@@ -59,6 +59,17 @@ export function ProductDetail({ product, related }: ProductDetailProps) {
 
         {product.description && (
           <p className="text-sm leading-relaxed text-muted">{product.description}</p>
+        )}
+
+        {product.expirationDate && (
+          <p className="text-sm text-muted">
+            <span className="font-medium text-ink">{strings.products.detail.expires}:</span>{" "}
+            {new Date(product.expirationDate).toLocaleDateString("es-VE", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
         )}
       </div>
 

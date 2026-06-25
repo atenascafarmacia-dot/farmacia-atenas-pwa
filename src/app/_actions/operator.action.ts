@@ -5,9 +5,14 @@ import { z } from "zod";
 
 import { strings } from "@/lib/strings";
 import { updateOrderStatusSchema } from "@/schemas/order.schema";
-import { completeOrder, setOrderStatus } from "@/services/order.service";
+import { completeOrder, setOrderStatus, setPaymentStatus } from "@/services/order.service";
 
 const completeOrderSchema = z.object({
+  orderId: z.cuid(),
+  code: z.string().min(1),
+});
+
+const markPaidSchema = z.object({
   orderId: z.cuid(),
   code: z.string().min(1),
 });
@@ -33,6 +38,25 @@ export async function completeOrderAction(input: unknown): Promise<CompleteOrder
     await completeOrder(parsed.data.orderId);
   } catch {
     return { ok: false, error: strings.operator.completeError };
+  }
+
+  revalidateOrderViews(parsed.data.code);
+  return { ok: true };
+}
+
+export type MarkOrderPaidActionResult = { ok: true } | { ok: false; error: string };
+
+/** Marks an order's payment as PAGADO and revalidates the views that show it. */
+export async function markOrderPaidAction(input: unknown): Promise<MarkOrderPaidActionResult> {
+  const parsed = markPaidSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: strings.operator.payment.error };
+  }
+
+  try {
+    await setPaymentStatus(parsed.data.orderId, "PAGADO");
+  } catch {
+    return { ok: false, error: strings.operator.payment.error };
   }
 
   revalidateOrderViews(parsed.data.code);

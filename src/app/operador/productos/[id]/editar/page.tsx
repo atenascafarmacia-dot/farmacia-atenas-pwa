@@ -3,9 +3,14 @@ import { notFound } from "next/navigation";
 
 import { updateProductAction } from "@/app/_actions/product.action";
 import { BackButton } from "@/components/molecules/BackButton";
+import { ProductBatchManager } from "@/components/organisms/ProductBatchManager";
 import { ProductForm } from "@/components/organisms/ProductForm";
 import { strings } from "@/lib/strings";
-import { getProductForManagement } from "@/services/product.service";
+import {
+  getCategories,
+  getProductBatches,
+  getProductForManagement,
+} from "@/services/product.service";
 
 type Params = Promise<{ id: string }>;
 
@@ -26,7 +31,11 @@ export async function generateMetadata({
 export default async function EditProductPage({ params }: { params: Params }) {
   const { id } = await params;
 
-  const product = await getProductForManagement(id);
+  const [product, categories, batches] = await Promise.all([
+    getProductForManagement(id),
+    getCategories(),
+    getProductBatches(id),
+  ]);
   if (!product) notFound();
 
   // Bind the product id so the form action keeps the (prev, formData) shape.
@@ -41,7 +50,9 @@ export default async function EditProductPage({ params }: { params: Params }) {
         </h1>
       </header>
 
-      <ProductForm action={action} product={product} />
+      <ProductForm action={action} categories={categories} product={product} />
+
+      <ProductBatchManager productId={product.id} batches={batches} />
     </section>
   );
 }

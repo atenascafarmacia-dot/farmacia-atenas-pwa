@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { userIdentificationSchema } from "@/schemas/user.schema";
-import { findOrCreateUser, setSession } from "@/services/session.service";
+import { findOrCreateUser, isOperator, setSession } from "@/services/session.service";
 
 export type IdentifyActionState = {
   ok: false;
@@ -31,10 +31,9 @@ export async function identifyAction(
     return { ok: false, errors };
   }
 
-  let userId: string;
+  let user;
   try {
-    const user = await findOrCreateUser(parsed.data.name, parsed.data.phone);
-    userId = user.id;
+    user = await findOrCreateUser(parsed.data.name, parsed.data.phone);
   } catch {
     return {
       ok: false,
@@ -43,6 +42,7 @@ export async function identifyAction(
     };
   }
 
-  await setSession(userId);
-  redirect("/catalogo");
+  await setSession(user.id);
+  // Operators land on their dashboard; customers on the catalog.
+  redirect(isOperator(user) ? "/operador" : "/catalogo");
 }

@@ -7,6 +7,7 @@ import type { z } from "zod";
 import { strings } from "@/lib/strings";
 import { type ProductInput, productSchema } from "@/schemas/product.schema";
 import { createProduct, deleteProduct, updateProduct } from "@/services/product.service";
+import { isCurrentUserOperator } from "@/services/session.service";
 
 export type ProductFormState = {
   ok: boolean;
@@ -20,7 +21,8 @@ function parseForm(formData: FormData) {
     description: formData.get("description"),
     price: formData.get("price"),
     stock: formData.get("stock"),
-    category: formData.get("category"),
+    categoryId: formData.get("categoryId"),
+    expirationDate: formData.get("expirationDate"),
     imageUrl: formData.get("imageUrl"),
     requiresPrescription: formData.get("requiresPrescription") === "on",
   });
@@ -46,6 +48,10 @@ export async function createProductAction(
   _prev: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
+  if (!(await isCurrentUserOperator())) {
+    return { ok: false, error: strings.management.forbidden };
+  }
+
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { ok: false, fieldErrors: toFieldErrors(parsed.error) };
@@ -66,6 +72,10 @@ export async function updateProductAction(
   _prev: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
+  if (!(await isCurrentUserOperator())) {
+    return { ok: false, error: strings.management.forbidden };
+  }
+
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { ok: false, fieldErrors: toFieldErrors(parsed.error) };
@@ -84,6 +94,10 @@ export async function updateProductAction(
 export type DeleteProductResult = { ok: true } | { ok: false; error: string };
 
 export async function deleteProductAction(id: string): Promise<DeleteProductResult> {
+  if (!(await isCurrentUserOperator())) {
+    return { ok: false, error: strings.management.forbidden };
+  }
+
   try {
     await deleteProduct(id);
   } catch {

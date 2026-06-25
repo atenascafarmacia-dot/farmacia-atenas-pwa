@@ -29,7 +29,7 @@ export default async function CatalogoPage({
 
   const search = typeof q === "string" && q.trim() ? q.trim() : undefined;
   const cat = typeof category === "string" && category ? category : undefined;
-  const filters = { search, category: cat };
+  const filters = { search, categoryId: cat };
 
   // Recommendations belong to the default browse view, not to filtered results.
   const showRecommendations = !search && !cat;

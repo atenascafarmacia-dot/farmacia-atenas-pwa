@@ -20,11 +20,11 @@ export const productSchema = z.object({
     .number({ message: "El stock es obligatorio." })
     .int("El stock debe ser un número entero.")
     .min(0, "El stock no puede ser negativo."),
-  category: z
-    .string()
-    .trim()
-    .min(2, "La categoría debe tener al menos 2 caracteres.")
-    .max(60, "La categoría no puede superar los 60 caracteres."),
+  categoryId: z.cuid("Selecciona una categoría válida."),
+  expirationDate: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    z.coerce.date("Fecha de vencimiento inválida.").optional(),
+  ),
   imageUrl: z
     .url("La URL de la imagen no es válida.")
     .optional()

@@ -29,14 +29,28 @@ export async function clearSession(): Promise<void> {
 }
 
 /**
- * Whether the given user is the configured operator. The operator is matched
- * by phone against the build-time `OPERATOR_PHONE` env var. Returns false when
- * the var is unset, so the operator view stays closed by default.
+ * Whether the given user can access the operator area. Access is granted to any
+ * non-customer role (ADMIN or FARMACEUTICO). Roles are assigned in the DB; the
+ * `OPERATOR_PHONE` env var only bootstraps the first operator at identify time
+ * (see {@link findOrCreateUser}).
  */
 export function isOperator(user: UserDto | null): boolean {
+  if (!user) return false;
+  return user.role !== "CLIENTE";
+}
+
+/**
+ * Whether the current session belongs to an operator. Server actions are
+ * directly invocable, so writes guarded only by route layout must re-check this.
+ */
+export async function isCurrentUserOperator(): Promise<boolean> {
+  return isOperator(await getCurrentUser());
+}
+
+/** Whether the phone matches the configured operator-bootstrap number. */
+function isBootstrapOperatorPhone(phone: string): boolean {
   const operatorPhone = process.env.OPERATOR_PHONE?.trim();
-  if (!operatorPhone || !user) return false;
-  return user.phone.trim() === operatorPhone;
+  return Boolean(operatorPhone) && phone.trim() === operatorPhone;
 }
 
 export async function findOrCreateUser(
@@ -45,5 +59,8 @@ export async function findOrCreateUser(
 ): Promise<UserDto> {
   const existing = await userRepository.findByPhone(phone);
   if (existing) return existing;
-  return userRepository.create({ name, phone });
+  // Bootstrap: the configured operator phone is created with the ADMIN role so
+  // the operator area is reachable without manual DB edits.
+  const role = isBootstrapOperatorPhone(phone) ? "ADMIN" : "CLIENTE";
+  return userRepository.create({ name, phone, role });
 }

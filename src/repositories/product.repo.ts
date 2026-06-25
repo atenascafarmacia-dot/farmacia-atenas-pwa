@@ -7,7 +7,8 @@ const SELECT_PRODUCT = {
   price: true,
   stock: true,
   imageUrl: true,
-  category: true,
+  category: { select: { id: true, name: true } },
+  expirationDate: true,
   requiresPrescription: true,
   isActive: true,
   createdAt: true,
@@ -20,7 +21,8 @@ export type ProductDto = {
   price: number;
   stock: number;
   imageUrl: string | null;
-  category: string;
+  category: { id: string; name: string };
+  expirationDate: Date | null;
   requiresPrescription: boolean;
   isActive: boolean;
   createdAt: Date;
@@ -33,12 +35,13 @@ export type ProductWriteData = {
   price: number;
   stock: number;
   imageUrl: string | null;
-  category: string;
+  categoryId: string;
+  expirationDate: Date | null;
   requiresPrescription: boolean;
 };
 
 export type ProductFilters = {
-  category?: string;
+  categoryId?: string;
   search?: string;
   requiresPrescription?: boolean;
 };
@@ -50,7 +53,7 @@ export const productRepository = {
     prisma.product.findMany({
       where: {
         isActive: true,
-        ...(filters.category && { category: filters.category }),
+        ...(filters.categoryId && { categoryId: filters.categoryId }),
         ...(filters.requiresPrescription !== undefined && {
           requiresPrescription: filters.requiresPrescription,
         }),
@@ -80,16 +83,6 @@ export const productRepository = {
       .map((id) => byId.get(id))
       .filter((p): p is ProductDto => p !== undefined);
   },
-
-  findCategories: (): Promise<string[]> =>
-    prisma.product
-      .findMany({
-        where: { isActive: true },
-        select: { category: true },
-        distinct: ["category"],
-        orderBy: { category: "asc" },
-      })
-      .then((rows) => rows.map((r) => r.category)),
 
   decrementStock: (id: string, quantity: number): Promise<void> =>
     prisma.product

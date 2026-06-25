@@ -7,15 +7,24 @@ import type { ProductFormState } from "@/app/_actions/product.action";
 import { Input } from "@/components/atoms/Input";
 import { SubmitButton } from "@/components/molecules/SubmitButton";
 import { strings } from "@/lib/strings";
+import type { CategoryDto } from "@/repositories/category.repo";
 import type { ProductDto } from "@/repositories/product.repo";
 
 interface ProductFormProps {
   action: (prev: ProductFormState, formData: FormData) => Promise<ProductFormState>;
+  /** Categories available for the select. */
+  categories: CategoryDto[];
   /** Present in edit mode to prefill the fields. */
   product?: ProductDto;
 }
 
-export function ProductForm({ action, product }: ProductFormProps) {
+/** Formats a Date as the `YYYY-MM-DD` value an <input type="date"> expects. */
+function toDateInput(date: Date | null | undefined): string {
+  if (!date) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+export function ProductForm({ action, categories, product }: ProductFormProps) {
   const [state, formAction] = useActionState<ProductFormState, FormData>(action, null);
   const fieldErrors = state?.fieldErrors;
   const f = strings.management.form;
@@ -37,13 +46,35 @@ export function ProductForm({ action, product }: ProductFormProps) {
         required
       />
 
-      <Input
-        label={f.category}
-        name="category"
-        defaultValue={product?.category}
-        error={fieldErrors?.category}
-        required
-      />
+      <div className="flex flex-col gap-1">
+        <label htmlFor="categoryId" className="text-sm font-medium text-ink">
+          {f.category}
+        </label>
+        <select
+          id="categoryId"
+          name="categoryId"
+          defaultValue={product?.category.id ?? ""}
+          required
+          className={`min-h-[44px] w-full rounded-xl border bg-card px-4 py-2.5 text-base text-ink focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+            fieldErrors?.categoryId ? "border-danger" : "border-border"
+          }`}
+          aria-invalid={fieldErrors?.categoryId ? "true" : undefined}
+        >
+          <option value="" disabled>
+            {f.categoryPlaceholder}
+          </option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        {fieldErrors?.categoryId && (
+          <p role="alert" className="text-sm text-danger">
+            {fieldErrors.categoryId}
+          </p>
+        )}
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         <Input
@@ -69,6 +100,14 @@ export function ProductForm({ action, product }: ProductFormProps) {
           required
         />
       </div>
+
+      <Input
+        label={f.expirationDate}
+        name="expirationDate"
+        type="date"
+        defaultValue={toDateInput(product?.expirationDate)}
+        error={fieldErrors?.expirationDate}
+      />
 
       <Input
         label={f.imageUrl}

@@ -57,6 +57,22 @@ export default async function PedidoPage({ params }: { params: Params }) {
           ))}
         </ul>
 
+        <dl className="mt-3 flex flex-col gap-1.5 border-t border-border pt-3 text-sm">
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted">{strings.operator.delivery}</dt>
+            <dd className="text-right text-ink">
+              {strings.orders.deliveryLabel[order.deliveryMethod]}
+            </dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted">{strings.operator.payment.method}</dt>
+            <dd className="text-right text-ink">
+              {strings.orders.paymentMethodLabel[order.paymentMethod]} ·{" "}
+              {strings.orders.paymentStatusLabel[order.paymentStatus]}
+            </dd>
+          </div>
+        </dl>
+
         <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
           <span className="text-sm font-semibold text-ink">
             {strings.orders.receipt.total}

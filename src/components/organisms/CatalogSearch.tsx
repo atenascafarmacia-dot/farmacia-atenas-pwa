@@ -4,10 +4,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { startTransition, useCallback, useState } from "react";
 
 import { SearchBar } from "@/components/molecules/SearchBar";
+import type { CategoryDto } from "@/repositories/category.repo";
 
 interface CatalogSearchProps {
-  categories: string[];
+  categories: CategoryDto[];
   initialSearch: string;
+  /** Currently active category id (empty = all). */
   initialCategory: string;
 }
 
@@ -76,17 +78,17 @@ export function CatalogSearch({
               </button>
             </li>
             {categories.map((cat) => (
-              <li key={cat}>
+              <li key={cat.id}>
                 <button
-                  onClick={() => handleCategory(cat)}
-                  aria-pressed={activeCategory === cat}
+                  onClick={() => handleCategory(cat.id)}
+                  aria-pressed={activeCategory === cat.id}
                   className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
-                    activeCategory === cat
+                    activeCategory === cat.id
                       ? "border-primary-600 bg-primary-600 text-white"
                       : "border-border bg-card text-muted hover:bg-primary-50 hover:text-primary-700"
                   }`}
                 >
-                  {cat}
+                  {cat.name}
                 </button>
               </li>
             ))}

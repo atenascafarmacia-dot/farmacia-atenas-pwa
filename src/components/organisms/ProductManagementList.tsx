@@ -29,7 +29,7 @@ export function ProductManagementList({ products }: ProductManagementListProps) 
               )}
             </div>
             <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
-              <span className="[font-variant:small-caps]">{product.category}</span>
+              <span className="[font-variant:small-caps]">{product.category.name}</span>
               <span aria-hidden="true">·</span>
               <Price amount={product.price} className="text-xs text-ink" />
               <span aria-hidden="true">·</span>

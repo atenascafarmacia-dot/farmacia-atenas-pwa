@@ -14,29 +14,88 @@ enum OrderStatus {
   CANCELADA
 }
 
+enum Role {
+  CLIENTE
+  ADMIN
+  FARMACEUTICO
+}
+
+enum DeliveryMethod {
+  RETIRO_TIENDA
+  ENVIO_DOMICILIO
+}
+
+enum PaymentMethod {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  PAGO_MOVIL
+}
+
+enum PaymentStatus {
+  PENDIENTE
+  PAGADO
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[]
+}
+
 model Product {
-  id                   String      @id @default(cuid())
+  id                   String         @id @default(cuid())
   name                 String
   description          String?
   price                Float
-  stock                Int         @default(0)
+  stock                Int            @default(0)
   imageUrl             String?
-  category             String
-  requiresPrescription Boolean     @default(false)
-  isActive             Boolean     @default(true)
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
+  categoryId           String
+  category             Category       @relation(fields: [categoryId], references: [id])
+  expirationDate       DateTime?
+  requiresPrescription Boolean        @default(false)
+  isActive             Boolean        @default(true)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
   orderItems           OrderItem[]
+  batches              ProductBatch[]
+}
+
+/// Inventory detail by lot. Informational for now: Product.stock remains the
+/// authoritative figure decremented when placing an order.
+model ProductBatch {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  lotNumber String
+  expiresAt DateTime?
+  stock     Int       @default(0)
+  createdAt DateTime  @default(now())
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
-  email     String?  @unique
+  email     String?   @unique
   phone     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role      @default(CLIENTE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   orders    Order[]
+  addresses Address[]
+}
+
+/// Reusable address book entry. A user can have several.
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String?
+  address   String
+  city      String
+  state     String
+  zipCode   String?
+  createdAt DateTime @default(now())
 }
 
 model Order {
@@ -46,6 +105,18 @@ model Order {
   user      User        @relation(fields: [userId], references: [id])
   status    OrderStatus @default(PENDIENTE)
   total     Float
+
+  deliveryMethod DeliveryMethod @default(RETIRO_TIENDA)
+  paymentMethod  PaymentMethod
+  paymentStatus  PaymentStatus  @default(PENDIENTE)
+  notes          String?
+
+  // Snapshot of the shipping address at purchase time (only for ENVIO_DOMICILIO).
+  shippingAddress String?
+  shippingCity    String?
+  shippingState   String?
+  shippingZip     String?
+
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   items     OrderItem[]

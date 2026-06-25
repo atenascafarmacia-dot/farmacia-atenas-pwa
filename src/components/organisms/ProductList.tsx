@@ -13,7 +13,7 @@ interface ProductListProps {
 
 export function ProductList({ products, filters }: ProductListProps) {
   if (products.length === 0) {
-    const isFiltered = Boolean(filters?.search ?? filters?.category);
+    const isFiltered = Boolean(filters?.search ?? filters?.categoryId);
     return (
       <EmptyState
         icon={<PackageSearch className="h-7 w-7" strokeWidth={1.5} />}

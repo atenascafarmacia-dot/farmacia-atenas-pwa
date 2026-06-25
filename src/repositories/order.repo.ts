@@ -1,8 +1,21 @@
 import { Prisma } from "@/generated/prisma/client";
-import { type OrderStatus } from "@/generated/prisma/enums";
+import {
+  type DeliveryMethod,
+  type OrderStatus,
+  type PaymentMethod,
+  type PaymentStatus,
+} from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
-export type { OrderStatus };
+export type { DeliveryMethod, OrderStatus, PaymentMethod, PaymentStatus };
+
+/** Snapshot of the shipping address captured on the order at purchase time. */
+export type ShippingSnapshot = {
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingZip: string | null;
+};
 
 export type OrderSummaryDto = {
   id: string;
@@ -47,6 +60,14 @@ export type OrderDetailDto = {
   code: string;
   status: OrderStatus;
   total: number;
+  deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  notes: string | null;
+  shippingAddress: string | null;
+  shippingCity: string | null;
+  shippingState: string | null;
+  shippingZip: string | null;
   createdAt: Date;
   updatedAt: Date;
   user: { id: string; name: string; email: string | null; phone: string };
@@ -56,6 +77,11 @@ export type OrderDetailDto = {
 export type CreateOrderData = {
   code: string;
   userId: string;
+  deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
+  notes: string | null;
+  /** Required for ENVIO_DOMICILIO; null for store pickup. */
+  shipping: ShippingSnapshot | null;
   items: Array<{ productId: string; quantity: number }>;
 };
 
@@ -77,6 +103,14 @@ const SELECT_ORDER_DETAIL = {
   code: true,
   status: true,
   total: true,
+  deliveryMethod: true,
+  paymentMethod: true,
+  paymentStatus: true,
+  notes: true,
+  shippingAddress: true,
+  shippingCity: true,
+  shippingState: true,
+  shippingZip: true,
   createdAt: true,
   updatedAt: true,
   user: { select: { id: true, name: true, email: true, phone: true } },
@@ -159,7 +193,15 @@ export const orderRepository = {
    * recomputed from the DB inside the transaction (never trusting the client),
    * stock is validated and decremented in the same atomic unit.
    */
-  createWithItems: ({ code, userId, items }: CreateOrderData): Promise<OrderDetailDto> =>
+  createWithItems: ({
+    code,
+    userId,
+    deliveryMethod,
+    paymentMethod,
+    notes,
+    shipping,
+    items,
+  }: CreateOrderData): Promise<OrderDetailDto> =>
     prisma.$transaction(async (tx) => {
       const products = await tx.product.findMany({
         where: { id: { in: items.map((i) => i.productId) } },
@@ -179,7 +221,19 @@ export const orderRepository = {
       const total = orderItems.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
 
       const order = await tx.order.create({
-        data: { code, userId, total, items: { create: orderItems } },
+        data: {
+          code,
+          userId,
+          total,
+          deliveryMethod,
+          paymentMethod,
+          notes,
+          shippingAddress: shipping?.shippingAddress ?? null,
+          shippingCity: shipping?.shippingCity ?? null,
+          shippingState: shipping?.shippingState ?? null,
+          shippingZip: shipping?.shippingZip ?? null,
+          items: { create: orderItems },
+        },
         select: SELECT_ORDER_DETAIL,
       });
 
@@ -197,4 +251,14 @@ export const orderRepository = {
 
   updateStatus: (id: string, status: OrderStatus): Promise<{ id: string; status: OrderStatus }> =>
     prisma.order.update({ where: { id }, data: { status }, select: { id: true, status: true } }),
+
+  updatePaymentStatus: (
+    id: string,
+    paymentStatus: PaymentStatus,
+  ): Promise<{ id: string; paymentStatus: PaymentStatus }> =>
+    prisma.order.update({
+      where: { id },
+      data: { paymentStatus },
+      select: { id: true, paymentStatus: true },
+    }),
 };

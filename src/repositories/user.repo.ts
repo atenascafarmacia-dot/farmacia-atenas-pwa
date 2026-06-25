@@ -1,10 +1,14 @@
+import { type Role } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
+
+export type { Role };
 
 const SELECT_USER = {
   id: true,
   name: true,
   email: true,
   phone: true,
+  role: true,
   createdAt: true,
 } as const;
 
@@ -13,6 +17,7 @@ export type UserDto = {
   name: string;
   email: string | null;
   phone: string;
+  role: Role;
   createdAt: Date;
 };
 
@@ -20,6 +25,7 @@ export type CreateUserData = {
   name: string;
   phone: string;
   email?: string;
+  role?: Role;
 };
 
 export const userRepository = {

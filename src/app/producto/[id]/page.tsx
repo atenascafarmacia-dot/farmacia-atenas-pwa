@@ -27,7 +27,7 @@ export default async function ProductPage({ params }: { params: Params }) {
   const product = await getProductById(id);
   if (!product) notFound();
 
-  const related = (await getProducts({ category: product.category }))
+  const related = (await getProducts({ categoryId: product.category.id }))
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
 

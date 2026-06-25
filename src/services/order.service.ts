@@ -1,16 +1,18 @@
 import { createOrderCode } from "@/lib/code";
 import { strings } from "@/lib/strings";
+import { addressRepository } from "@/repositories/address.repo";
 import {
   type OrderDetailDto,
   OrderError,
   type OrderListItemDto,
   orderRepository,
   type OrderStatus,
+  type PaymentStatus,
+  type ShippingSnapshot,
 } from "@/repositories/order.repo";
 import {
   type OrderListFilter,
   orderListFilterSchema,
-  type PlaceOrderInput,
   placeOrderSchema,
 } from "@/schemas/order.schema";
 
@@ -69,6 +71,14 @@ export async function setOrderStatus(orderId: string, status: OrderStatus): Prom
   await orderRepository.updateStatus(orderId, status);
 }
 
+/** Sets the payment status of an order (operator action). */
+export async function setPaymentStatus(
+  orderId: string,
+  paymentStatus: PaymentStatus,
+): Promise<void> {
+  await orderRepository.updatePaymentStatus(orderId, paymentStatus);
+}
+
 /** Maps a domain error to a user-facing Spanish message. */
 function messageFor(error: unknown): string {
   if (error instanceof OrderError) {
@@ -87,7 +97,7 @@ function messageFor(error: unknown): string {
  * Order + OrderItems atomically. The total is always recomputed server-side
  * inside the repository transaction from DB prices.
  */
-export async function createOrder(input: PlaceOrderInput): Promise<CreateOrderResult> {
+export async function createOrder(input: unknown): Promise<CreateOrderResult> {
   const parsed = placeOrderSchema.safeParse(input);
   if (!parsed.success) {
     return {
@@ -96,12 +106,43 @@ export async function createOrder(input: PlaceOrderInput): Promise<CreateOrderRe
     };
   }
 
+  const { data } = parsed;
+  const isDelivery = data.deliveryMethod === "ENVIO_DOMICILIO";
+  const shipping: ShippingSnapshot | null = isDelivery
+    ? {
+        shippingAddress: data.shippingAddress!.trim(),
+        shippingCity: data.shippingCity!.trim(),
+        shippingState: data.shippingState!.trim(),
+        shippingZip: data.shippingZip?.trim() ? data.shippingZip.trim() : null,
+      }
+    : null;
+
   try {
     const order = await orderRepository.createWithItems({
       code: createOrderCode(),
-      userId: parsed.data.userId,
-      items: parsed.data.items,
+      userId: data.userId,
+      deliveryMethod: data.deliveryMethod,
+      paymentMethod: data.paymentMethod,
+      notes: data.notes?.trim() ? data.notes.trim() : null,
+      shipping,
+      items: data.items,
     });
+
+    // Best-effort: persist a typed-in delivery address to the user's book.
+    if (shipping && data.saveAddress) {
+      try {
+        await addressRepository.create(data.userId, {
+          label: null,
+          address: shipping.shippingAddress,
+          city: shipping.shippingCity,
+          state: shipping.shippingState,
+          zipCode: shipping.shippingZip,
+        });
+      } catch {
+        // Saving the address is non-critical; the order already succeeded.
+      }
+    }
+
     return { ok: true, data: order };
   } catch (error) {
     return { ok: false, error: messageFor(error) };
