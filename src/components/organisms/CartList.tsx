@@ -88,7 +88,7 @@ export function CartList() {
         ))}
       </ul>
 
-      <div className="sticky bottom-0 -mx-4 border-t border-border bg-card px-4 pb-4 pt-3">
+      <div className="sticky bottom-[56px] -mx-4 border-t border-border bg-card px-4 pb-4 pt-3">
         <div className="mb-3 flex items-center justify-between rounded-xl bg-primary-50 px-4 py-3">
           <span className="text-sm font-semibold text-ink">{strings.cart.total}</span>
           <Price amount={total} className="text-xl font-bold text-primary-700" />
