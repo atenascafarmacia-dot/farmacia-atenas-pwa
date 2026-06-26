@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "dev:https": "next dev --experimental-https",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "preview": "next build && next start",
     "preview:network": "next build && next start -H 0.0.0.0",
+    "postinstall": "prisma generate",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
