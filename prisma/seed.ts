@@ -1,4 +1,4 @@
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "../src/generated/prisma/client";
 import {
@@ -9,9 +9,7 @@ import {
   Role,
 } from "../src/generated/prisma/enums";
 
-const rawUrl = process.env.DATABASE_URL ?? "file:./dev.db";
-const url = rawUrl.replace(/^file:/, "");
-const adapter = new PrismaBetterSqlite3({ url });
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const db = new PrismaClient({ adapter });
 
 /** Adds `days` to a base date; used to spread example expiration dates. */

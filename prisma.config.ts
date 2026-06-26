@@ -11,6 +11,9 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Prisma Migrate / CLI connects via the Supabase session-mode pooler
+    // (DIRECT_URL). The app runtime uses the transaction-mode pooler
+    // (DATABASE_URL) through the driver adapter in src/lib/prisma.ts.
+    url: process.env["DIRECT_URL"],
   },
 });
