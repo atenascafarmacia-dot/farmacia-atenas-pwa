@@ -104,6 +104,47 @@ export const strings = {
       backToCatalog: "Volver al catálogo",
       notFoundTitle: "Pedido no encontrado",
       notFoundMessage: "El pedido que buscas no existe o el código no es válido.",
+      payment: {
+        title: "Datos para el pago",
+        hint: "Realiza el pago a una de estas cuentas y muestra el comprobante en el mostrador.",
+        methods: [
+          {
+            name: "Banco de Venezuela",
+            rows: [
+              { label: "Titular", value: "José Avendaño" },
+              { label: "C.I.", value: "17.219.769" },
+              { label: "Cuenta", value: "0102 0219 1100 0089 1219" },
+            ],
+            notes: [] as string[],
+          },
+          {
+            name: "Pago móvil",
+            rows: [
+              { label: "Banco", value: "Banco Exterior" },
+              { label: "C.I.", value: "17.369.504" },
+              { label: "Teléfono", value: "0424-7125689" },
+            ],
+            notes: [] as string[],
+          },
+          {
+            name: "Zelle",
+            rows: [{ label: "Correo", value: "tuliobricenoucab@gmail.com" }],
+            notes: [
+              "Monto mínimo de 50 $.",
+              "Toma una foto del pago e indica el nombre y número de teléfono de quien realiza el pago.",
+            ] as string[],
+          },
+          {
+            name: "Bancolombia",
+            rows: [
+              { label: "Titular", value: "Alix Vargas" },
+              { label: "Ahorros", value: "726 665 56136" },
+              { label: "Cédula", value: "1.102.392.519" },
+            ],
+            notes: [] as string[],
+          },
+        ],
+      },
     },
     status: {
       pending: "Pendiente",

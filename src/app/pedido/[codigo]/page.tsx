@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Price } from "@/components/atoms/Price";
+import { PaymentMethods } from "@/components/organisms/PaymentMethods";
 import { QRView } from "@/components/organisms/QRView";
 import { createOrderQr } from "@/lib/code";
 import { strings } from "@/lib/strings";
@@ -80,6 +81,8 @@ export default async function PedidoPage({ params }: { params: Params }) {
           <Price amount={order.total} className="text-lg font-bold text-primary-700" />
         </div>
       </div>
+
+      <PaymentMethods />
 
       <Link
         href="/catalogo"
