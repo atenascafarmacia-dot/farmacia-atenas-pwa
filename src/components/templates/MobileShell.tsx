@@ -14,8 +14,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { CurrencyHydrator } from "@/components/atoms/CurrencyHydrator";
 import { StoreHydrator } from "@/components/atoms/StoreHydrator";
 import { Wordmark } from "@/components/atoms/Wordmark";
+import { CurrencyToggle } from "@/components/molecules/CurrencyToggle";
 import { InstallButton } from "@/components/molecules/InstallButton";
 import { UserChip } from "@/components/molecules/UserChip";
 import { strings } from "@/lib/strings";
@@ -108,11 +110,15 @@ function BottomNav({ isOperator }: { isOperator: boolean }) {
   );
 }
 
-function TopBar({ userName }: { userName: string }) {
+function TopBar({ userName, isOperator }: { userName: string; isOperator: boolean }) {
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between gap-2 border-b border-border bg-card/95 px-4 py-2 shadow-soft backdrop-blur">
       <Wordmark />
-      <UserChip userName={userName} />
+      <div className="flex items-center gap-2">
+        {/* Operators work in stored USD; the toggle is a customer affordance. */}
+        {!isOperator && <CurrencyToggle />}
+        <UserChip userName={userName} />
+      </div>
     </header>
   );
 }
@@ -121,12 +127,15 @@ interface MobileShellProps {
   children: ReactNode;
   isOperator?: boolean;
   userName?: string | null;
+  /** Per-USD rates for this request; null = that currency is unconfigured. */
+  exchangeRates?: { ves: number | null; cop: number | null };
 }
 
 export function MobileShell({
   children,
   isOperator = false,
   userName = null,
+  exchangeRates = { ves: null, cop: null },
 }: MobileShellProps) {
   // Unauthenticated users only see the login screen — no top bar or bottom nav.
   const isAuthenticated = Boolean(userName);
@@ -134,12 +143,13 @@ export function MobileShell({
   return (
     <div className="flex min-h-screen flex-col bg-surface">
       <div className="mx-auto flex w-full max-w-[430px] flex-1 flex-col">
-        {isAuthenticated && <TopBar userName={userName!} />}
+        {isAuthenticated && <TopBar userName={userName!} isOperator={isOperator} />}
         <main className={`flex-1 ${isAuthenticated ? "pb-[56px]" : ""}`}>{children}</main>
       </div>
       {isAuthenticated && <BottomNav isOperator={isOperator} />}
       <InstallButton />
       <StoreHydrator />
+      <CurrencyHydrator rates={exchangeRates} />
     </div>
   );
 }

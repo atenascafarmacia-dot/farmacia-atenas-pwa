@@ -5,6 +5,7 @@ import { BackButton } from "@/components/molecules/BackButton";
 import { CheckoutForm } from "@/components/organisms/CheckoutForm";
 import { strings } from "@/lib/strings";
 import { getUserAddresses } from "@/services/address.service";
+import { getStockMap } from "@/services/product.service";
 import { getCurrentUser } from "@/services/session.service";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default async function CheckoutPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/");
 
-  const addresses = await getUserAddresses(user.id);
+  const [addresses, stockById] = await Promise.all([getUserAddresses(user.id), getStockMap()]);
 
   return (
     <section className="flex flex-col gap-4 px-4 pb-6 pt-4">
@@ -27,7 +28,7 @@ export default async function CheckoutPage() {
         </div>
       </header>
 
-      <CheckoutForm addresses={addresses} />
+      <CheckoutForm addresses={addresses} stockById={stockById} />
     </section>
   );
 }

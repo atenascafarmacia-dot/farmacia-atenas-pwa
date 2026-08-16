@@ -6,16 +6,13 @@ import { Price } from "@/components/atoms/Price";
 import { PaymentMethods } from "@/components/organisms/PaymentMethods";
 import { QRView } from "@/components/organisms/QRView";
 import { createOrderQr } from "@/lib/code";
+import { CURRENCY_SYMBOL, formatRate } from "@/lib/money";
 import { strings } from "@/lib/strings";
 import { getOrderByCode } from "@/services/order.service";
 
 type Params = Promise<{ codigo: string }>;
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Params;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { codigo } = await params;
   return {
     title: `Farmacia — Pedido ${codigo}`,
@@ -39,9 +36,7 @@ export default async function PedidoPage({ params }: { params: Params }) {
       <QRView code={order.code} qrDataUrl={qrDataUrl} />
 
       <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-        <h2 className="mb-3 text-sm font-semibold text-ink">
-          {strings.orders.receipt.summary}
-        </h2>
+        <h2 className="mb-3 text-sm font-semibold text-ink">{strings.orders.receipt.summary}</h2>
 
         <ul className="flex flex-col divide-y divide-border" role="list">
           {order.items.map((item) => (
@@ -52,6 +47,8 @@ export default async function PedidoPage({ params }: { params: Params }) {
               </span>
               <Price
                 amount={item.unitPrice * item.quantity}
+                currency={order.currency}
+                rate={order.exchangeRate}
                 className="text-sm text-ink"
               />
             </li>
@@ -74,15 +71,28 @@ export default async function PedidoPage({ params }: { params: Params }) {
           </div>
         </dl>
 
-        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-          <span className="text-sm font-semibold text-ink">
-            {strings.orders.receipt.total}
-          </span>
-          <Price amount={order.total} className="text-lg font-bold text-primary-700" />
+        <div className="mt-3 border-t border-border pt-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-ink">{strings.orders.receipt.total}</span>
+            <Price
+              amount={order.total}
+              currency={order.currency}
+              rate={order.exchangeRate}
+              className="text-lg font-bold text-primary-700"
+            />
+          </div>
+          {order.currency !== "USD" && order.exchangeRate != null && (
+            <p className="mt-0.5 text-right text-xs text-muted">
+              {strings.orders.receipt.rateUsed(
+                CURRENCY_SYMBOL[order.currency],
+                formatRate(order.exchangeRate),
+              )}
+            </p>
+          )}
         </div>
       </div>
 
-      <PaymentMethods />
+      <PaymentMethods currency={order.currency} />
 
       <Link
         href="/catalogo"

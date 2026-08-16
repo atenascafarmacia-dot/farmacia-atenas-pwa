@@ -60,7 +60,7 @@ export function ProductCard({ product }: ProductCardProps) {
           name={product.name}
           price={product.price}
           imageUrl={product.imageUrl}
-          outOfStock={outOfStock}
+          stock={product.stock}
         />
       </div>
     </article>

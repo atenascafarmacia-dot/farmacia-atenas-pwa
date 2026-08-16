@@ -37,6 +37,21 @@ enum PaymentStatus {
   PAGADO
 }
 
+enum Currency {
+  USD
+  VES
+  COP
+}
+
+/// Single-row app settings (PK fixed to "main"). usdVesRate = Bs per 1 USD,
+/// usdCopRate = COP per 1 USD; a null rate disables that currency for customers.
+model Setting {
+  id         String   @id @default("main")
+  usdVesRate Float?
+  usdCopRate Float?
+  updatedAt  DateTime @updatedAt
+}
+
 model Category {
   id        String    @id @default(cuid())
   name      String    @unique
@@ -61,8 +76,9 @@ model Product {
   batches              ProductBatch[]
 }
 
-/// Inventory detail by lot. Informational for now: Product.stock remains the
-/// authoritative figure decremented when placing an order.
+/// Merchandise entry by lot: creating a batch increments Product.stock by its
+/// units and deleting it decrements (floored at 0). Product.stock remains the
+/// authoritative figure orders validate against and decrement.
 model ProductBatch {
   id        String    @id @default(cuid())
   productId String
@@ -71,6 +87,8 @@ model ProductBatch {
   expiresAt DateTime?
   stock     Int       @default(0)
   createdAt DateTime  @default(now())
+
+  @@unique([productId, lotNumber])
 }
 
 model User {
@@ -110,6 +128,11 @@ model Order {
   paymentMethod  PaymentMethod
   paymentStatus  PaymentStatus  @default(PENDIENTE)
   notes          String?
+
+  // Snapshot of the payment currency and Bs-per-USD rate at purchase time.
+  // Totals stay stored in USD; null rate = created before rates existed.
+  currency     Currency @default(USD)
+  exchangeRate Float?
 
   // Snapshot of the shipping address at purchase time (only for ENVIO_DOMICILIO).
   shippingAddress String?

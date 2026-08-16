@@ -2,6 +2,7 @@ import { Price } from "@/components/atoms/Price";
 import { CompleteOrderButton } from "@/components/molecules/CompleteOrderButton";
 import { MarkOrderPaidButton } from "@/components/molecules/MarkOrderPaidButton";
 import { OrderStatusBadge } from "@/components/molecules/OrderStatusBadge";
+import { CURRENCY_SYMBOL, formatMoney, formatRate } from "@/lib/money";
 import { strings } from "@/lib/strings";
 import type { OrderDetailDto } from "@/repositories/order.repo";
 
@@ -21,9 +22,7 @@ export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-soft">
-        <span className="font-mono text-lg font-bold tracking-widest text-ink">
-          {order.code}
-        </span>
+        <span className="font-mono text-lg font-bold tracking-widest text-ink">{order.code}</span>
         <OrderStatusBadge status={order.status} />
       </div>
 
@@ -67,10 +66,14 @@ export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
             </dd>
           </div>
           <div className="flex justify-between gap-3">
+            <dt className="text-muted">{strings.operator.payment.currency}</dt>
+            <dd className="text-right text-ink">
+              {strings.operator.currencyLabel[order.currency]}
+            </dd>
+          </div>
+          <div className="flex justify-between gap-3">
             <dt className="text-muted">{strings.operator.payment.status}</dt>
-            <dd
-              className={`text-right font-medium ${isPaid ? "text-success" : "text-danger"}`}
-            >
+            <dd className={`text-right font-medium ${isPaid ? "text-success" : "text-danger"}`}>
               {strings.orders.paymentStatusLabel[order.paymentStatus]}
             </dd>
           </div>
@@ -113,22 +116,34 @@ export function OperatorOrderPanel({ order }: OperatorOrderPanelProps) {
               </span>
               <Price
                 amount={item.unitPrice * item.quantity}
+                currency="USD"
                 className="text-sm text-ink"
               />
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-          <span className="text-sm font-semibold text-ink">
-            {strings.operator.total}
-          </span>
-          <Price amount={order.total} className="text-lg font-bold text-primary-700" />
+        <div className="mt-3 border-t border-border pt-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-ink">{strings.operator.total}</span>
+            <Price
+              amount={order.total}
+              currency="USD"
+              className="text-lg font-bold text-primary-700"
+            />
+          </div>
+          {order.currency !== "USD" && order.exchangeRate != null && (
+            <p className="mt-0.5 text-right text-xs text-muted">
+              {formatMoney(order.total, order.currency, order.exchangeRate)} ·{" "}
+              {strings.orders.receipt.rateUsed(
+                CURRENCY_SYMBOL[order.currency],
+                formatRate(order.exchangeRate),
+              )}
+            </p>
+          )}
         </div>
       </div>
 
-      {!isPaid && !isCancelled && (
-        <MarkOrderPaidButton orderId={order.id} code={order.code} />
-      )}
+      {!isPaid && !isCancelled && <MarkOrderPaidButton orderId={order.id} code={order.code} />}
 
       {isClosed ? (
         <p

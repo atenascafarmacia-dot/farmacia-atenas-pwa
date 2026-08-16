@@ -8,8 +8,10 @@ import {
   type BatchFormState,
   deleteBatchAction,
 } from "@/app/_actions/batch.action";
+import { Badge } from "@/components/atoms/Badge";
 import { Input } from "@/components/atoms/Input";
 import { SubmitButton } from "@/components/molecules/SubmitButton";
+import { formatCalendarDateEs, isExpired, isNearExpiry, todayDateInputValue } from "@/lib/date";
 import { strings } from "@/lib/strings";
 import type { ProductBatchDto } from "@/repositories/batch.repo";
 
@@ -20,11 +22,7 @@ interface ProductBatchManagerProps {
 
 function formatDate(date: Date | null): string {
   if (!date) return strings.management.batches.noExpiry;
-  return new Date(date).toLocaleDateString("es-VE", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return formatCalendarDateEs(date);
 }
 
 export function ProductBatchManager({ productId, batches }: ProductBatchManagerProps) {
@@ -62,6 +60,15 @@ export function ProductBatchManager({ productId, batches }: ProductBatchManagerP
                 <span className="ml-2 text-muted">
                   {formatDate(batch.expiresAt)} · {batch.stock} {b.stock.toLowerCase()}
                 </span>
+                {isExpired(batch.expiresAt) ? (
+                  <Badge variant="danger" className="ml-2">
+                    {b.expired}
+                  </Badge>
+                ) : isNearExpiry(batch.expiresAt) ? (
+                  <Badge variant="warning" className="ml-2">
+                    {b.nearExpiry}
+                  </Badge>
+                ) : null}
               </div>
               <button
                 type="button"
@@ -83,7 +90,11 @@ export function ProductBatchManager({ productId, batches }: ProductBatchManagerP
         </p>
       )}
 
-      <form action={formAction} noValidate className="flex flex-col gap-3 border-t border-border pt-3">
+      <form
+        action={formAction}
+        noValidate
+        className="flex flex-col gap-3 border-t border-border pt-3"
+      >
         {state?.error && (
           <p role="alert" className="rounded-xl bg-danger-bg p-3 text-sm text-danger">
             {state.error}
@@ -97,7 +108,13 @@ export function ProductBatchManager({ productId, batches }: ProductBatchManagerP
           required
         />
         <div className="grid grid-cols-2 gap-3">
-          <Input label={b.expiresAt} name="expiresAt" type="date" error={fieldErrors?.expiresAt} />
+          <Input
+            label={b.expiresAt}
+            name="expiresAt"
+            type="date"
+            min={todayDateInputValue()}
+            error={fieldErrors?.expiresAt}
+          />
           <Input
             label={b.stock}
             name="stock"

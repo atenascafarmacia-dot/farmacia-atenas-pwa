@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge } from "@/components/atoms/Badge";
 import { Price } from "@/components/atoms/Price";
 import { DeleteProductButton } from "@/components/molecules/DeleteProductButton";
+import { isExpired, isNearExpiry } from "@/lib/date";
 import { strings } from "@/lib/strings";
 import type { ProductDto } from "@/repositories/product.repo";
 
@@ -24,14 +25,17 @@ export function ProductManagementList({ products }: ProductManagementListProps) 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h2 className="truncate text-sm font-semibold text-ink">{product.name}</h2>
-              {!product.isActive && (
-                <Badge variant="neutral">{strings.management.inactive}</Badge>
-              )}
+              {!product.isActive && <Badge variant="neutral">{strings.management.inactive}</Badge>}
+              {isExpired(product.expirationDate) ? (
+                <Badge variant="danger">{strings.management.batches.expired}</Badge>
+              ) : isNearExpiry(product.expirationDate) ? (
+                <Badge variant="warning">{strings.management.batches.nearExpiry}</Badge>
+              ) : null}
             </div>
             <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
               <span className="[font-variant:small-caps]">{product.category.name}</span>
               <span aria-hidden="true">·</span>
-              <Price amount={product.price} className="text-xs text-ink" />
+              <Price amount={product.price} currency="USD" className="text-xs text-ink" />
               <span aria-hidden="true">·</span>
               <span>Stock {product.stock}</span>
             </p>

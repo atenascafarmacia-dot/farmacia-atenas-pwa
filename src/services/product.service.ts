@@ -1,4 +1,4 @@
-import { batchRepository, type ProductBatchDto } from "@/repositories/batch.repo";
+import { BatchError, batchRepository, type ProductBatchDto } from "@/repositories/batch.repo";
 import { type CategoryDto, categoryRepository } from "@/repositories/category.repo";
 import {
   type ProductDto,
@@ -23,6 +23,15 @@ export async function getProductById(id: string) {
   return productRepository.findById(id);
 }
 
+/**
+ * Live stock per active product id. The cart lives only in the client, so the
+ * cart/checkout pages fetch this map and match it against the stored items.
+ */
+export async function getStockMap(): Promise<Record<string, number>> {
+  const levels = await productRepository.findStockLevels();
+  return Object.fromEntries(levels.map((l) => [l.id, l.stock]));
+}
+
 // ---- Management ----
 
 export async function getProductsForManagement(): Promise<ProductDto[]> {
@@ -39,19 +48,29 @@ export async function getProductBatches(productId: string): Promise<ProductBatch
   return batchRepository.findByProduct(productId);
 }
 
+export type AddBatchResult = { ok: true } | { ok: false; reason: "DUPLICATE_LOT" };
+
 export async function addProductBatch(
   productId: string,
   input: BatchInput,
-): Promise<ProductBatchDto> {
-  return batchRepository.create(productId, {
-    lotNumber: input.lotNumber,
-    expiresAt: input.expiresAt ?? null,
-    stock: input.stock,
-  });
+): Promise<AddBatchResult> {
+  try {
+    await batchRepository.createWithStockEntry(productId, {
+      lotNumber: input.lotNumber,
+      expiresAt: input.expiresAt ?? null,
+      stock: input.stock,
+    });
+    return { ok: true };
+  } catch (error) {
+    if (error instanceof BatchError && error.code === "DUPLICATE_LOT") {
+      return { ok: false, reason: "DUPLICATE_LOT" };
+    }
+    throw error;
+  }
 }
 
 export async function removeProductBatch(id: string, productId: string): Promise<void> {
-  return batchRepository.delete(id, productId);
+  return batchRepository.deleteWithStockRemoval(id, productId);
 }
 
 /** Normalizes validated form input into persistable data (empty → null). */

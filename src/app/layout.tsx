@@ -5,6 +5,7 @@ import { Fraunces, Inter } from "next/font/google";
 
 import { MobileShell } from "@/components/templates/MobileShell";
 import { getCurrentUser, isOperator } from "@/services/session.service";
+import { getExchangeRates } from "@/services/setting.service";
 
 // Sans body font → exposed as `--font-inter` (Tailwind `font-sans`).
 const inter = Inter({
@@ -44,16 +45,17 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   // The operator nav entry is only shown to the configured operator.
-  const user = await getCurrentUser();
+  const [user, rates] = await Promise.all([getCurrentUser(), getExchangeRates()]);
   const operator = isOperator(user);
 
   return (
-    <html
-      lang="es"
-      className={`${inter.variable} ${fraunces.variable} antialiased`}
-    >
+    <html lang="es" className={`${inter.variable} ${fraunces.variable} antialiased`}>
       <body>
-        <MobileShell isOperator={operator} userName={user?.name ?? null}>
+        <MobileShell
+          isOperator={operator}
+          userName={user?.name ?? null}
+          exchangeRates={{ ves: rates?.ves ?? null, cop: rates?.cop ?? null }}
+        >
           {children}
         </MobileShell>
         {/* Parallel slot for intercepted routes (e.g. the product modal). */}

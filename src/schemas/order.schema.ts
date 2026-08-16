@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { DeliveryMethod, OrderStatus, PaymentMethod } from "@/generated/prisma/enums";
+import { Currency, DeliveryMethod, OrderStatus, PaymentMethod } from "@/generated/prisma/enums";
 import { cartItemSchema } from "@/schemas/cart.schema";
 import { userIdentificationSchema } from "@/schemas/user.schema";
 
@@ -32,7 +32,13 @@ export const placeOrderSchema = z
     items: orderItemsSchema,
     deliveryMethod: z.enum(DeliveryMethod, { message: "Método de entrega inválido." }),
     paymentMethod: z.enum(PaymentMethod, { message: "Método de pago inválido." }),
-    notes: z.string().trim().max(500, "Las notas no pueden superar los 500 caracteres.").optional().or(z.literal("")),
+    currency: z.enum(Currency, { message: "Moneda inválida." }).default("USD"),
+    notes: z
+      .string()
+      .trim()
+      .max(500, "Las notas no pueden superar los 500 caracteres.")
+      .optional()
+      .or(z.literal("")),
     shippingAddress: optionalText,
     shippingCity: optionalText,
     shippingState: optionalText,

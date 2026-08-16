@@ -14,9 +14,14 @@ export type BatchFormState = {
   fieldErrors?: Partial<Record<keyof BatchInput, string>>;
 } | null;
 
-function toFieldErrors(
-  error: z.ZodError<BatchInput>,
-): Partial<Record<keyof BatchInput, string>> {
+/** Batches now move Product.stock, so the catalog and management list change too. */
+function revalidateAfterStockChange(productId: string) {
+  revalidatePath(`/operador/productos/${productId}/editar`);
+  revalidatePath("/operador/productos");
+  revalidatePath("/catalogo");
+}
+
+function toFieldErrors(error: z.ZodError<BatchInput>): Partial<Record<keyof BatchInput, string>> {
   const fieldErrors: Partial<Record<keyof BatchInput, string>> = {};
   for (const issue of error.issues) {
     const key = issue.path[0] as keyof BatchInput | undefined;
@@ -44,21 +49,24 @@ export async function addBatchAction(
   }
 
   try {
-    await addProductBatch(productId, parsed.data);
+    const result = await addProductBatch(productId, parsed.data);
+    if (!result.ok) {
+      return {
+        ok: false,
+        fieldErrors: { lotNumber: strings.management.batches.duplicateLot },
+      };
+    }
   } catch {
     return { ok: false, error: strings.management.batches.addError };
   }
 
-  revalidatePath(`/operador/productos/${productId}/editar`);
+  revalidateAfterStockChange(productId);
   return { ok: true };
 }
 
 export type DeleteBatchResult = { ok: true } | { ok: false; error: string };
 
-export async function deleteBatchAction(
-  id: string,
-  productId: string,
-): Promise<DeleteBatchResult> {
+export async function deleteBatchAction(id: string, productId: string): Promise<DeleteBatchResult> {
   if (!(await isCurrentUserOperator())) {
     return { ok: false, error: strings.management.batches.deleteError };
   }
@@ -69,6 +77,6 @@ export async function deleteBatchAction(
     return { ok: false, error: strings.management.batches.deleteError };
   }
 
-  revalidatePath(`/operador/productos/${productId}/editar`);
+  revalidateAfterStockChange(productId);
   return { ok: true };
 }

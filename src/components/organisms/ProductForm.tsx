@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import type { ProductFormState } from "@/app/_actions/product.action";
 import { Input } from "@/components/atoms/Input";
 import { SubmitButton } from "@/components/molecules/SubmitButton";
+import { toDateInputValue, todayDateInputValue } from "@/lib/date";
 import { strings } from "@/lib/strings";
 import type { CategoryDto } from "@/repositories/category.repo";
 import type { ProductDto } from "@/repositories/product.repo";
@@ -16,12 +17,6 @@ interface ProductFormProps {
   categories: CategoryDto[];
   /** Present in edit mode to prefill the fields. */
   product?: ProductDto;
-}
-
-/** Formats a Date as the `YYYY-MM-DD` value an <input type="date"> expects. */
-function toDateInput(date: Date | null | undefined): string {
-  if (!date) return "";
-  return date.toISOString().slice(0, 10);
 }
 
 export function ProductForm({ action, categories, product }: ProductFormProps) {
@@ -77,12 +72,11 @@ export function ProductForm({ action, categories, product }: ProductFormProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
+        {/* type="text": iOS rejects comma decimals on type="number" inputs. */}
         <Input
           label={f.price}
           name="price"
-          type="number"
-          step="0.01"
-          min="0"
+          type="text"
           inputMode="decimal"
           defaultValue={product?.price}
           error={fieldErrors?.price}
@@ -105,7 +99,8 @@ export function ProductForm({ action, categories, product }: ProductFormProps) {
         label={f.expirationDate}
         name="expirationDate"
         type="date"
-        defaultValue={toDateInput(product?.expirationDate)}
+        min={todayDateInputValue()}
+        defaultValue={toDateInputValue(product?.expirationDate)}
         error={fieldErrors?.expirationDate}
       />
 

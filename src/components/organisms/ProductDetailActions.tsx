@@ -12,7 +12,7 @@ interface ProductDetailActionsProps {
   name: string;
   price: number;
   imageUrl: string | null;
-  outOfStock: boolean;
+  stock: number;
 }
 
 const MAX_QUANTITY = 99;
@@ -23,7 +23,7 @@ export function ProductDetailActions({
   name,
   price,
   imageUrl,
-  outOfStock,
+  stock,
 }: ProductDetailActionsProps) {
   const add = useCartStore((s) => s.add);
   const setQuantity = useCartStore((s) => s.setQuantity);
@@ -32,7 +32,7 @@ export function ProductDetailActions({
   const [quantity, setQuantity_] = useState(1);
   const [added, setAdded] = useState(false);
 
-  if (outOfStock) {
+  if (stock === 0) {
     return (
       <Button className="w-full" size="lg" disabled>
         {strings.products.outOfStock}
@@ -40,21 +40,37 @@ export function ProductDetailActions({
     );
   }
 
+  const inCart = items.find((i) => i.productId === productId)?.quantity ?? 0;
+  const maxAddable = Math.min(MAX_QUANTITY, stock) - inCart;
+
+  if (maxAddable <= 0) {
+    return (
+      <div className="flex flex-col gap-3">
+        <Button className="w-full" size="lg" disabled>
+          {strings.cart.addItem}
+        </Button>
+        <p role="status" className="text-center text-sm text-muted">
+          {strings.cart.maxReached}
+        </p>
+      </div>
+    );
+  }
+
   function handleAdd() {
     // Use the existing store API: ensure the item exists, then set the
-    // absolute target quantity (current + chosen) without mutating the store.
-    const current = items.find((i) => i.productId === productId)?.quantity ?? 0;
-    add({ productId, name, price, imageUrl });
-    setQuantity(productId, Math.min(MAX_QUANTITY, current + quantity));
+    // absolute target quantity (current + chosen), never beyond the stock.
+    add({ productId, name, price, imageUrl }, stock);
+    setQuantity(productId, Math.min(MAX_QUANTITY, stock, inCart + quantity));
     setAdded(true);
   }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium text-ink">
-          {strings.products.detail.quantity}
-        </span>
+        <div className="flex flex-col">
+          <span className="text-sm font-medium text-ink">{strings.products.detail.quantity}</span>
+          <span className="text-xs text-muted">{strings.products.availableCount(stock)}</span>
+        </div>
         <QuantityStepper
           value={quantity}
           onChange={(v) => {
@@ -62,7 +78,7 @@ export function ProductDetailActions({
             setAdded(false);
           }}
           min={1}
-          max={MAX_QUANTITY}
+          max={maxAddable}
         />
       </div>
 

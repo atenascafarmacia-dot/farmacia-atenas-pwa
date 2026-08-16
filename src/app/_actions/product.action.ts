@@ -5,8 +5,13 @@ import { redirect } from "next/navigation";
 import type { z } from "zod";
 
 import { strings } from "@/lib/strings";
-import { type ProductInput, productSchema } from "@/schemas/product.schema";
-import { createProduct, deleteProduct, updateProduct } from "@/services/product.service";
+import { buildProductSchema, type ProductInput, productSchema } from "@/schemas/product.schema";
+import {
+  createProduct,
+  deleteProduct,
+  getProductForManagement,
+  updateProduct,
+} from "@/services/product.service";
 import { isCurrentUserOperator } from "@/services/session.service";
 
 export type ProductFormState = {
@@ -15,8 +20,8 @@ export type ProductFormState = {
   fieldErrors?: Partial<Record<keyof ProductInput, string>>;
 } | null;
 
-function parseForm(formData: FormData) {
-  return productSchema.safeParse({
+function parseForm(formData: FormData, schema: typeof productSchema = productSchema) {
+  return schema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
     price: formData.get("price"),
@@ -76,7 +81,13 @@ export async function updateProductAction(
     return { ok: false, error: strings.management.forbidden };
   }
 
-  const parsed = parseForm(formData);
+  // Editing may keep an already-stored past expiration date; only new past
+  // dates are rejected.
+  const current = await getProductForManagement(id);
+  const parsed = parseForm(
+    formData,
+    buildProductSchema({ allowExpirationDate: current?.expirationDate }),
+  );
   if (!parsed.success) {
     return { ok: false, fieldErrors: toFieldErrors(parsed.error) };
   }

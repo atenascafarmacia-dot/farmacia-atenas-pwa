@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Price } from "@/components/atoms/Price";
 import { EmptyState } from "@/components/molecules/EmptyState";
 import { OrderStatusBadge } from "@/components/molecules/OrderStatusBadge";
+import { formatMoney } from "@/lib/money";
 import { strings } from "@/lib/strings";
 import type { OrderListItemDto } from "@/repositories/order.repo";
 
@@ -51,7 +52,14 @@ export function OrderList({ orders }: OrderListProps) {
               </span>
             </div>
             <div className="flex shrink-0 items-center gap-1.5">
-              <Price amount={order.total} className="text-sm text-primary-700" />
+              <div className="flex flex-col items-end">
+                <Price amount={order.total} currency="USD" className="text-sm text-primary-700" />
+                {order.currency !== "USD" && order.exchangeRate != null && (
+                  <span className="text-xs text-muted">
+                    {formatMoney(order.total, order.currency, order.exchangeRate)}
+                  </span>
+                )}
+              </div>
               <ChevronRight size={18} className="text-muted" aria-hidden="true" />
             </div>
           </Link>

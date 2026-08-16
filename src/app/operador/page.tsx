@@ -1,4 +1,12 @@
-import { ClipboardList, Hourglass, Package, PackageX, ScanSearch, Tags } from "lucide-react";
+import {
+  ClipboardList,
+  Hourglass,
+  Package,
+  PackageX,
+  ScanSearch,
+  Settings,
+  Tags,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -17,11 +25,7 @@ export const metadata: Metadata = {
 
 type SearchParams = Promise<{ code?: string | string[] }>;
 
-export default async function OperadorPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function OperadorPage({ searchParams }: { searchParams: SearchParams }) {
   // Only the configured operator (matched by OPERATOR_PHONE) may see this view.
   const user = await getCurrentUser();
   if (!user || !isOperator(user)) notFound();
@@ -32,8 +36,7 @@ export default async function OperadorPage({
 
   // Throttle lookups per operator session to curb code brute-forcing.
   const limited =
-    rawCode.length > 0 &&
-    !rateLimit(`operator-search:${user.id}`, 20, 10_000).allowed;
+    rawCode.length > 0 && !rateLimit(`operator-search:${user.id}`, 20, 10_000).allowed;
   const order = rawCode && !limited ? await getOrderByCode(rawCode) : null;
 
   return (
@@ -64,6 +67,13 @@ export default async function OperadorPage({
           >
             <Tags size={16} strokeWidth={2} aria-hidden="true" />
             {strings.operator.manageCategories}
+          </Link>
+          <Link
+            href="/operador/configuracion"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-primary-100 bg-primary-50 px-3.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          >
+            <Settings size={16} strokeWidth={2} aria-hidden="true" />
+            {strings.operator.settings.manage}
           </Link>
         </div>
       </header>

@@ -31,6 +31,15 @@ export const strings = {
     installAria: "Instalar la aplicación en tu dispositivo",
   },
 
+  currency: {
+    usd: "$",
+    ves: "Bs",
+    cop: "COP",
+    toggleAria: "Cambiar la moneda de los precios",
+    vesUnavailable: "Tasa en bolívares no configurada",
+    copUnavailable: "Tasa en pesos no configurada",
+  },
+
   validation: {
     required: "Este campo es obligatorio.",
     invalidEmail: "Correo electrónico inválido.",
@@ -60,6 +69,9 @@ export const strings = {
     checkout: "Proceder al pago",
     total: "Total",
     quantity: "Cantidad",
+    onlyLeft: (n: number) => (n === 1 ? "Solo queda 1 unidad" : `Solo quedan ${n} unidades`),
+    adjustToContinue: "Ajusta las cantidades para continuar.",
+    maxReached: "Ya tienes el máximo disponible en tu carrito.",
   },
 
   products: {
@@ -67,6 +79,7 @@ export const strings = {
     empty: "No se encontraron productos.",
     outOfStock: "Sin stock",
     addToCart: "Agregar",
+    availableCount: (n: number) => (n === 1 ? "1 disponible" : `${n} disponibles`),
     prescription: "Requiere receta médica",
     price: "Precio",
     frequentlyBought: "Comprados frecuentemente",
@@ -93,6 +106,12 @@ export const strings = {
       notIdentified: "Debes identificarte antes de realizar un pedido.",
       productUnavailable: "Uno de los productos ya no está disponible.",
       insufficientStock: "No hay stock suficiente para uno de los productos.",
+      rateUnavailable:
+        "No hay tasa de cambio configurada para esa moneda. Selecciona otra e intenta de nuevo.",
+      insufficientStockFor: (name: string, available: number) =>
+        available > 0
+          ? `Solo ${available === 1 ? "queda 1 unidad" : `quedan ${available} unidades`} de “${name}”.`
+          : `“${name}” está agotado.`,
       failed: "No se pudo crear el pedido. Intenta de nuevo.",
     },
     receipt: {
@@ -104,9 +123,12 @@ export const strings = {
       backToCatalog: "Volver al catálogo",
       notFoundTitle: "Pedido no encontrado",
       notFoundMessage: "El pedido que buscas no existe o el código no es válido.",
+      rateUsed: (symbol: string, rate: string) => `Tasa aplicada: ${symbol} ${rate} por $`,
       payment: {
         title: "Datos para el pago",
         hint: "Realiza el pago a una de estas cuentas y muestra el comprobante en el mostrador.",
+        // `currencies` filters each account by the order's payment currency;
+        // null = shown for every currency.
         methods: [
           {
             name: "Banco de Venezuela",
@@ -116,6 +138,7 @@ export const strings = {
               { label: "Cuenta", value: "0102 0219 1100 0089 1219" },
             ],
             notes: [] as string[],
+            currencies: ["VES"] as string[] | null,
           },
           {
             name: "Pago móvil",
@@ -125,6 +148,7 @@ export const strings = {
               { label: "Teléfono", value: "0424-7125689" },
             ],
             notes: [] as string[],
+            currencies: ["VES"] as string[] | null,
           },
           {
             name: "Zelle",
@@ -133,6 +157,7 @@ export const strings = {
               "Monto mínimo de 50 $.",
               "Toma una foto del pago e indica el nombre y número de teléfono de quien realiza el pago.",
             ] as string[],
+            currencies: ["USD"] as string[] | null,
           },
           {
             name: "Bancolombia",
@@ -142,6 +167,7 @@ export const strings = {
               { label: "Cédula", value: "1.102.392.519" },
             ],
             notes: [] as string[],
+            currencies: ["COP"] as string[] | null,
           },
         ],
       },
@@ -216,6 +242,8 @@ export const strings = {
     scanTitle: "Escanear código QR",
     scanInstruction: "Apunta la cámara al QR del pedido.",
     scanUnsupported: "Este navegador no permite escanear. Teclea el código manualmente.",
+    scanInsecure:
+      "El escaneo requiere una conexión segura (https). Abre la app desde el dominio de producción.",
     scanPermissionDenied: "Sin acceso a la cámara. Habilita el permiso o teclea el código.",
     scanError: "No se pudo iniciar la cámara. Intenta de nuevo.",
     emptyTitle: "Busca un pedido",
@@ -239,6 +267,7 @@ export const strings = {
     payment: {
       section: "Pago",
       method: "Método",
+      currency: "Moneda",
       status: "Estado del pago",
       markPaid: "Marcar como pagado",
       error: "No se pudo actualizar el pago. Intenta de nuevo.",
@@ -246,6 +275,28 @@ export const strings = {
     manageProducts: "Gestionar productos",
     manageCategories: "Gestionar categorías",
     viewOrders: "Ver pedidos",
+    currencyLabel: {
+      USD: "Dólares ($)",
+      VES: "Bolívares (Bs)",
+      COP: "Pesos (COP)",
+    },
+    settings: {
+      title: "Configuración",
+      subtitle: "Tasas de cambio para los pagos en bolívares y pesos.",
+      manage: "Configuración",
+      vesRateLabel: "Tasa Bs por USD",
+      copRateLabel: "Tasa COP por USD",
+      rateHint:
+        "Cuántos bolívares/pesos equivalen a 1 dólar. Deja un campo vacío para deshabilitar esa moneda.",
+      currentRate: (symbol: string, rate: string) => `${symbol} ${rate} por $`,
+      currentRatesTitle: "Tasas actuales:",
+      lastUpdated: (date: string) => `Actualizadas: ${date}`,
+      noRate: "Aún no hay tasas configuradas. Los clientes solo verán precios en $.",
+      save: "Guardar tasas",
+      saving: "Guardando…",
+      saved: "Tasas guardadas.",
+      saveError: "No se pudieron guardar las tasas. Intenta de nuevo.",
+    },
     orders: {
       title: "Pedidos",
       subtitle: "Consulta y gestiona los pedidos de la farmacia.",
@@ -330,15 +381,17 @@ export const strings = {
         message: (name: string) => `¿Eliminar la categoría “${name}”?`,
         confirm: "Eliminar",
         cancel: "Cancelar",
-        inUse:
-          "No se puede eliminar: hay productos en esta categoría. Reasígnalos primero.",
+        inUse: "No se puede eliminar: hay productos en esta categoría. Reasígnalos primero.",
         error: "No se pudo eliminar la categoría. Intenta de nuevo.",
       },
     },
     batches: {
       title: "Lotes",
-      subtitle: "Inventario por lote (informativo). El stock del producto rige los pedidos.",
+      subtitle: "Registrar un lote suma sus unidades al stock del producto.",
       empty: "Este producto no tiene lotes registrados.",
+      expired: "Vencido",
+      nearExpiry: "Por vencer",
+      duplicateLot: "Ya existe un lote con ese número para este producto.",
       lotNumber: "Número de lote",
       expiresAt: "Vencimiento",
       noExpiry: "Sin vencimiento",
@@ -379,8 +432,7 @@ export const strings = {
     },
     remove: {
       title: "Eliminar dirección",
-      message: (label: string) =>
-        `¿Eliminar “${label}”? Esta acción no se puede deshacer.`,
+      message: (label: string) => `¿Eliminar “${label}”? Esta acción no se puede deshacer.`,
       confirm: "Eliminar",
       cancel: "Cancelar",
       error: "No se pudo eliminar la dirección. Intenta de nuevo.",

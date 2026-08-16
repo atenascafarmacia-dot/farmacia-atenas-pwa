@@ -16,9 +16,7 @@ import {
   placeOrderSchema,
 } from "@/schemas/order.schema";
 
-export type CreateOrderResult =
-  | { ok: true; data: OrderDetailDto }
-  | { ok: false; error: string };
+export type CreateOrderResult = { ok: true; data: OrderDetailDto } | { ok: false; error: string };
 
 /** Orders per page in the operator list. */
 const PAGE_SIZE = 10;
@@ -86,7 +84,11 @@ function messageFor(error: unknown): string {
       case "PRODUCT_NOT_FOUND":
         return strings.orders.create.productUnavailable;
       case "INSUFFICIENT_STOCK":
-        return strings.orders.create.insufficientStock;
+        return error.productName !== undefined && error.available !== undefined
+          ? strings.orders.create.insufficientStockFor(error.productName, error.available)
+          : strings.orders.create.insufficientStock;
+      case "RATE_UNAVAILABLE":
+        return strings.orders.create.rateUnavailable;
     }
   }
   return strings.orders.create.failed;
@@ -123,6 +125,7 @@ export async function createOrder(input: unknown): Promise<CreateOrderResult> {
       userId: data.userId,
       deliveryMethod: data.deliveryMethod,
       paymentMethod: data.paymentMethod,
+      currency: data.currency,
       notes: data.notes?.trim() ? data.notes.trim() : null,
       shipping,
       items: data.items,

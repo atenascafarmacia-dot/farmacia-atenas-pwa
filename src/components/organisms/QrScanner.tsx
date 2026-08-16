@@ -1,5 +1,6 @@
 "use client";
 
+import jsQR from "jsqr";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -11,7 +12,7 @@ interface QrScannerProps {
   onClose: () => void;
 }
 
-type ScanState = "starting" | "scanning" | "unsupported" | "denied" | "error";
+type ScanState = "starting" | "scanning" | "unsupported" | "insecure" | "denied" | "error";
 
 /**
  * Pulls the order code out of a scanned QR. The QR encodes the operator URL
@@ -40,14 +41,17 @@ function extractCode(raw: string): string | null {
 
 const ERROR_MESSAGE: Partial<Record<ScanState, string>> = {
   unsupported: strings.operator.scanUnsupported,
+  insecure: strings.operator.scanInsecure,
   denied: strings.operator.scanPermissionDenied,
   error: strings.operator.scanError,
 };
 
 /**
  * Full-screen QR scanner overlay for the operator. Uses the native
- * BarcodeDetector API + the device camera; degrades to a clear message when the
- * browser lacks support or camera permission is denied (manual entry still works).
+ * BarcodeDetector API when available (Chromium) and falls back to decoding
+ * video frames with jsQR (iOS Safari has no BarcodeDetector). Degrades to a
+ * clear message when the context is insecure, the browser lacks camera
+ * support, or permission is denied (manual entry still works).
  */
 export function QrScanner({ onResult, onClose }: QrScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -65,8 +69,13 @@ export function QrScanner({ onResult, onClose }: QrScannerProps) {
     }
 
     async function start() {
-      const Detector = window.BarcodeDetector;
-      if (!Detector || !navigator.mediaDevices?.getUserMedia) {
+      // getUserMedia only exists in secure contexts (https / localhost); on
+      // plain http iOS never exposes the camera at all.
+      if (!window.isSecureContext) {
+        setState("insecure");
+        return;
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
         setState("unsupported");
         return;
       }
@@ -87,24 +96,45 @@ export function QrScanner({ onResult, onClose }: QrScannerProps) {
       }
 
       const video = videoRef.current;
-      const detector = new Detector({ formats: ["qr_code"] });
+      // Native detector when available (Chromium); jsQR canvas fallback
+      // otherwise (iOS Safari).
+      const Detector = window.BarcodeDetector;
+      const detector = Detector ? new Detector({ formats: ["qr_code"] }) : null;
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+
       if (video) {
         video.srcObject = stream;
         await video.play().catch(() => {});
       }
       setState("scanning");
 
+      async function readFrame(source: HTMLVideoElement): Promise<string | null> {
+        if (detector) {
+          const codes = await detector.detect(source);
+          for (const barcode of codes) {
+            const code = extractCode(barcode.rawValue);
+            if (code) return code;
+          }
+          return null;
+        }
+        if (!context || source.videoWidth === 0) return null;
+        canvas.width = source.videoWidth;
+        canvas.height = source.videoHeight;
+        context.drawImage(source, 0, 0);
+        const image = context.getImageData(0, 0, canvas.width, canvas.height);
+        const result = jsQR(image.data, image.width, image.height);
+        return result ? extractCode(result.data) : null;
+      }
+
       const loop = async () => {
         if (cancelled || !video) return;
         try {
-          const codes = await detector.detect(video);
-          for (const barcode of codes) {
-            const code = extractCode(barcode.rawValue);
-            if (code) {
-              stop();
-              onResult(code);
-              return;
-            }
+          const code = await readFrame(video);
+          if (code) {
+            stop();
+            onResult(code);
+            return;
           }
         } catch {
           // Transient per-frame decode errors are expected; keep scanning.

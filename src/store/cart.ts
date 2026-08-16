@@ -10,7 +10,8 @@ export type CartEntry = {
 
 type CartState = {
   items: CartEntry[];
-  add: (entry: Omit<CartEntry, "quantity">) => void;
+  /** Adds one unit, capped at `max` (callers pass the product's stock). */
+  add: (entry: Omit<CartEntry, "quantity">, max?: number) => void;
   remove: (productId: string) => void;
   setQuantity: (productId: string, quantity: number) => void;
   clear: () => void;
@@ -19,14 +20,15 @@ type CartState = {
 export const useCartStore = create<CartState>()((set) => ({
   items: [],
 
-  add: (incoming) =>
+  add: (incoming, max = 99) =>
     set((state) => {
+      const cap = Math.min(99, Math.max(1, max));
       const existing = state.items.find((i) => i.productId === incoming.productId);
       if (existing) {
         return {
           items: state.items.map((i) =>
             i.productId === incoming.productId
-              ? { ...i, quantity: Math.min(99, i.quantity + 1) }
+              ? { ...i, quantity: Math.min(cap, i.quantity + 1) }
               : i,
           ),
         };
@@ -44,9 +46,7 @@ export const useCartStore = create<CartState>()((set) => ({
       items:
         quantity <= 0
           ? state.items.filter((i) => i.productId !== productId)
-          : state.items.map((i) =>
-              i.productId === productId ? { ...i, quantity } : i,
-            ),
+          : state.items.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
     })),
 
   clear: () => set({ items: [] }),

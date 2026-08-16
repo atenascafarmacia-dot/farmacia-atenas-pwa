@@ -11,30 +11,36 @@ import { Input } from "@/components/atoms/Input";
 import { Price } from "@/components/atoms/Price";
 import { EmptyState } from "@/components/molecules/EmptyState";
 import { DeliveryMethod, PaymentMethod } from "@/generated/prisma/enums";
+import { formatUsd } from "@/lib/money";
 import { strings } from "@/lib/strings";
 import type { AddressDto } from "@/services/address.service";
 import { selectCartTotal, useCartStore } from "@/store/cart";
+import { rateFor, useCurrencyStore } from "@/store/currency";
 
 interface CheckoutFormProps {
   addresses: AddressDto[];
+  /** Live stock per active product id; a missing id means the product is gone. */
+  stockById: Record<string, number>;
 }
 
 const NEW_ADDRESS = "new";
 
-export function CheckoutForm({ addresses }: CheckoutFormProps) {
+export function CheckoutForm({ addresses, stockById }: CheckoutFormProps) {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const clear = useCartStore((s) => s.clear);
   const total = useCartStore(selectCartTotal);
+  const currency = useCurrencyStore((s) => s.currency);
+  const rates = useCurrencyStore((s) => s.rates);
+
+  const hasStockIssues = items.some((item) => item.quantity > (stockById[item.productId] ?? 0));
 
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>(
     DeliveryMethod.RETIRO_TIENDA,
   );
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.EFECTIVO);
   const [notes, setNotes] = useState("");
-  const [selectedAddress, setSelectedAddress] = useState<string>(
-    addresses[0]?.id ?? NEW_ADDRESS,
-  );
+  const [selectedAddress, setSelectedAddress] = useState<string>(addresses[0]?.id ?? NEW_ADDRESS);
   const [newAddress, setNewAddress] = useState({ address: "", city: "", state: "", zipCode: "" });
   const [saveAddress, setSaveAddress] = useState(false);
 
@@ -70,6 +76,7 @@ export function CheckoutForm({ addresses }: CheckoutFormProps) {
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
       deliveryMethod,
       paymentMethod,
+      currency,
       notes,
       ...(shipping ?? {}),
       saveAddress: isDelivery && usingNewAddress && saveAddress,
@@ -260,16 +267,35 @@ export function CheckoutForm({ addresses }: CheckoutFormProps) {
 
       {/* Summary + submit */}
       <div className="sticky bottom-[56px] -mx-4 border-t border-border bg-card px-4 pb-4 pt-3">
-        <div className="mb-3 flex items-center justify-between rounded-xl bg-primary-50 px-4 py-3">
-          <span className="text-sm font-semibold text-ink">{c.total}</span>
-          <Price amount={total} className="text-xl font-bold text-primary-700" />
+        <div className="mb-3 rounded-xl bg-primary-50 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-ink">{c.total}</span>
+            <Price amount={total} className="text-xl font-bold text-primary-700" />
+          </div>
+          {currency !== "USD" && rateFor(currency, rates) != null && (
+            <p className="mt-0.5 text-right text-xs text-muted">{formatUsd(total)}</p>
+          )}
         </div>
         {error && (
           <p role="alert" className="mb-3 text-sm text-danger">
             {error}
           </p>
         )}
-        <Button className="w-full" size="lg" loading={isPending} onClick={handleSubmit}>
+        {hasStockIssues && (
+          <p role="alert" className="mb-3 text-center text-sm text-warning">
+            {strings.cart.adjustToContinue}{" "}
+            <Link href="/carrito" className="font-medium underline">
+              {c.backToCart}
+            </Link>
+          </p>
+        )}
+        <Button
+          className="w-full"
+          size="lg"
+          loading={isPending}
+          disabled={hasStockIssues}
+          onClick={handleSubmit}
+        >
           {c.submit}
         </Button>
       </div>

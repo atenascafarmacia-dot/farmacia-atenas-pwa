@@ -1,13 +1,15 @@
 import { Prisma } from "@/generated/prisma/client";
 import {
+  type Currency,
   type DeliveryMethod,
   type OrderStatus,
   type PaymentMethod,
   type PaymentStatus,
 } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
+import { sellableWhere } from "@/repositories/product.repo";
 
-export type { DeliveryMethod, OrderStatus, PaymentMethod, PaymentStatus };
+export type { Currency, DeliveryMethod, OrderStatus, PaymentMethod, PaymentStatus };
 
 /** Snapshot of the shipping address captured on the order at purchase time. */
 export type ShippingSnapshot = {
@@ -33,6 +35,8 @@ export type OrderListItemDto = {
   customerName: string;
   status: OrderStatus;
   total: number;
+  currency: Currency;
+  exchangeRate: number | null;
   itemsCount: number;
   createdAt: Date;
 };
@@ -60,6 +64,8 @@ export type OrderDetailDto = {
   code: string;
   status: OrderStatus;
   total: number;
+  currency: Currency;
+  exchangeRate: number | null;
   deliveryMethod: DeliveryMethod;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
@@ -79,19 +85,22 @@ export type CreateOrderData = {
   userId: string;
   deliveryMethod: DeliveryMethod;
   paymentMethod: PaymentMethod;
+  currency: Currency;
   notes: string | null;
   /** Required for ENVIO_DOMICILIO; null for store pickup. */
   shipping: ShippingSnapshot | null;
   items: Array<{ productId: string; quantity: number }>;
 };
 
-export type OrderErrorCode = "PRODUCT_NOT_FOUND" | "INSUFFICIENT_STOCK";
+export type OrderErrorCode = "PRODUCT_NOT_FOUND" | "INSUFFICIENT_STOCK" | "RATE_UNAVAILABLE";
 
 /** Domain error raised while placing an order; carries a code, not UI text. */
 export class OrderError extends Error {
   constructor(
     readonly code: OrderErrorCode,
     readonly productId?: string,
+    readonly productName?: string,
+    readonly available?: number,
   ) {
     super(code);
     this.name = "OrderError";
@@ -103,6 +112,8 @@ const SELECT_ORDER_DETAIL = {
   code: true,
   status: true,
   total: true,
+  currency: true,
+  exchangeRate: true,
   deliveryMethod: true,
   paymentMethod: true,
   paymentStatus: true,
@@ -128,8 +139,8 @@ const SELECT_ORDER_DETAIL = {
 function operatorWhere(filters: OrderQueryFilters): Prisma.OrderWhereInput {
   const where: Prisma.OrderWhereInput = {};
   if (filters.status) where.status = filters.status;
-  // Codes are stored/typed uppercase; SQLite LIKE is case-insensitive for ASCII.
-  if (filters.code) where.code = { contains: filters.code };
+  // Postgres contains is case-sensitive by default; match codes regardless of case.
+  if (filters.code) where.code = { contains: filters.code, mode: "insensitive" };
   return where;
 }
 
@@ -143,6 +154,8 @@ export const orderRepository = {
         code: true,
         status: true,
         total: true,
+        currency: true,
+        exchangeRate: true,
         createdAt: true,
         user: { select: { name: true } },
         _count: { select: { items: true } },
@@ -157,6 +170,8 @@ export const orderRepository = {
       customerName: o.user.name,
       status: o.status,
       total: o.total,
+      currency: o.currency,
+      exchangeRate: o.exchangeRate,
       itemsCount: o._count.items,
       createdAt: o.createdAt,
     }));
@@ -198,14 +213,29 @@ export const orderRepository = {
     userId,
     deliveryMethod,
     paymentMethod,
+    currency,
     notes,
     shipping,
     items,
   }: CreateOrderData): Promise<OrderDetailDto> =>
     prisma.$transaction(async (tx) => {
+      // The rate is read here — never from the client — so the snapshot is
+      // authoritative, like the prices recomputed below.
+      const setting = await tx.setting.findUnique({ where: { id: "main" } });
+      const exchangeRate =
+        currency === "VES"
+          ? (setting?.usdVesRate ?? null)
+          : currency === "COP"
+            ? (setting?.usdCopRate ?? null)
+            : null;
+      if (currency !== "USD" && exchangeRate == null) {
+        throw new OrderError("RATE_UNAVAILABLE");
+      }
+      // sellableWhere: inactive or expired products fall out and surface as
+      // PRODUCT_NOT_FOUND ("ya no está disponible").
       const products = await tx.product.findMany({
-        where: { id: { in: items.map((i) => i.productId) } },
-        select: { id: true, price: true, stock: true },
+        where: { id: { in: items.map((i) => i.productId) }, ...sellableWhere() },
+        select: { id: true, name: true, price: true, stock: true },
       });
       const productById = new Map(products.map((p) => [p.id, p]));
 
@@ -213,7 +243,7 @@ export const orderRepository = {
         const product = productById.get(item.productId);
         if (!product) throw new OrderError("PRODUCT_NOT_FOUND", item.productId);
         if (product.stock < item.quantity) {
-          throw new OrderError("INSUFFICIENT_STOCK", item.productId);
+          throw new OrderError("INSUFFICIENT_STOCK", item.productId, product.name, product.stock);
         }
         return { productId: item.productId, quantity: item.quantity, unitPrice: product.price };
       });
@@ -227,6 +257,8 @@ export const orderRepository = {
           total,
           deliveryMethod,
           paymentMethod,
+          currency,
+          exchangeRate,
           notes,
           shippingAddress: shipping?.shippingAddress ?? null,
           shippingCity: shipping?.shippingCity ?? null,
@@ -237,14 +269,19 @@ export const orderRepository = {
         select: SELECT_ORDER_DETAIL,
       });
 
-      await Promise.all(
-        orderItems.map((i) =>
-          tx.product.update({
-            where: { id: i.productId },
-            data: { stock: { decrement: i.quantity } },
-          }),
-        ),
-      );
+      // Guarded decrement: under Read Committed the WHERE re-evaluates against
+      // the committed row at write time, so concurrent checkouts can't drive
+      // stock negative — the loser rolls back (order row included).
+      for (const i of orderItems) {
+        const { count } = await tx.product.updateMany({
+          where: { id: i.productId, stock: { gte: i.quantity } },
+          data: { stock: { decrement: i.quantity } },
+        });
+        if (count === 0) {
+          const p = productById.get(i.productId);
+          throw new OrderError("INSUFFICIENT_STOCK", i.productId, p?.name, p?.stock);
+        }
+      }
 
       return order;
     }),

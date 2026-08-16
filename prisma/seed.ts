@@ -97,7 +97,8 @@ async function main() {
     },
     {
       name: "Loratadina 10mg x10",
-      description: "Antihistamínico de segunda generación. Alivia síntomas de alergia sin somnolencia.",
+      description:
+        "Antihistamínico de segunda generación. Alivia síntomas de alergia sin somnolencia.",
       price: 3.8,
       stock: 90,
       category: "Antialérgicos",
@@ -107,7 +108,8 @@ async function main() {
     },
     {
       name: "Vitamina C 1000mg x30",
-      description: "Suplemento de ácido ascórbico. Refuerza el sistema inmune y actúa como antioxidante.",
+      description:
+        "Suplemento de ácido ascórbico. Refuerza el sistema inmune y actúa como antioxidante.",
       price: 6.4,
       stock: 200,
       category: "Suplementos",
@@ -272,7 +274,17 @@ async function main() {
     },
   });
 
-  console.log(`Created orders: ${order1.code} (${order1.status}), ${order2.code} (${order2.status})`);
+  console.log(
+    `Created orders: ${order1.code} (${order1.status}), ${order2.code} (${order2.status})`,
+  );
+
+  const setting = await db.setting.upsert({
+    where: { id: "main" },
+    create: { id: "main", usdVesRate: 170, usdCopRate: 4000 },
+    update: {},
+  });
+  console.log(`Exchange rates: Bs ${setting.usdVesRate} / COP ${setting.usdCopRate} per USD.`);
+
   console.log("Seed complete.");
 }
 

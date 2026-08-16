@@ -50,10 +50,7 @@ export function ProductDetail({ product, related }: ProductDetailProps) {
           )}
         </div>
 
-        <h1
-          id={PRODUCT_DETAIL_TITLE_ID}
-          className="text-xl font-bold leading-tight text-ink"
-        >
+        <h1 id={PRODUCT_DETAIL_TITLE_ID} className="text-xl font-bold leading-tight text-ink">
           {product.name}
         </h1>
 
@@ -68,6 +65,9 @@ export function ProductDetail({ product, related }: ProductDetailProps) {
               year: "numeric",
               month: "long",
               day: "numeric",
+              // Stored as UTC midnight; local (UTC-4) formatting would show
+              // the previous day.
+              timeZone: "UTC",
             })}
           </p>
         )}
@@ -84,9 +84,7 @@ export function ProductDetail({ product, related }: ProductDetailProps) {
             aria-hidden="true"
             className={`h-2 w-2 rounded-full ${outOfStock ? "bg-danger" : "bg-success"}`}
           />
-          {outOfStock
-            ? strings.products.detail.unavailable
-            : strings.products.detail.available}
+          {outOfStock ? strings.products.detail.unavailable : strings.products.detail.available}
         </span>
       </div>
 
@@ -95,7 +93,7 @@ export function ProductDetail({ product, related }: ProductDetailProps) {
         name={product.name}
         price={product.price}
         imageUrl={product.imageUrl}
-        outOfStock={outOfStock}
+        stock={product.stock}
       />
 
       {related.length > 0 && (
